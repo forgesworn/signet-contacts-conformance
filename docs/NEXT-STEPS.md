@@ -76,15 +76,23 @@ as a port divergence.
   text; no test enforces that an adapter verifies, and a custom adapter that
   skips it is silently unsafe (see PORTING.md, "Relay adapters and client
   lifecycle").
+- **Malformed `xn--` labels in an all-ASCII host are accepted verbatim.**
+  For example `wss://xn--999999999.example/`, where the URL Standard's
+  domain-to-ASCII would reject them, because Node's URL implementation takes
+  an ASCII fast path that only lowercases the host and never runs Punycode
+  validation over it. Harmless, since such a host cannot resolve, but every
+  port must match it (see PORTING.md, "IDNA").
 
 ## Kotlin port divergences to revisit
 
 - Non-ASCII relay hosts go through `java.net.IDN` (IDNA 2003), which agrees
   with UTS #46 for ordinary hosts. The four deviation characters (U+00DF,
   U+03C2, U+200C, U+200D) and code points unassigned in Unicode 3.2 are
-  rejected (fail closed) where the reference accepts them. `xn--` labels are
-  validated with an RFC 3492 decoder on both paths. `invite.json` carries
-  these as known divergences: `relay "wss://faß.de/"`,
+  rejected (fail closed) where the reference accepts them. A pure-ASCII host
+  is only lowercased and its `xn--` labels are never Punycode-validated,
+  matching the reference's own ASCII fast path; only a non-ASCII host's
+  `xn--` labels are validated with an RFC 3492 decoder. `invite.json` carries
+  exactly four cases as known divergences: `relay "wss://faß.de/"`,
   `relay "wss://ς.example/"`, `relay "wss://ẞ.example/"` and
   `relay "wss://%C3%9F.example/"`. On Android, `android.icu.text.IDNA` (API
   24 and up) implements UTS #46 and could replace `java.net.IDN` there.

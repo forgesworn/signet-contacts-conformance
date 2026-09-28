@@ -75,24 +75,44 @@ would disagree about them.
 
 ### IDNA
 
-WHATWG's domain-to-ASCII is UTS #46 with `Transitional_Processing=false`,
-`CheckHyphens=false`, `CheckBidi=true`, `CheckJoiners=true`,
-`UseSTD3ASCIIRules=false`, `VerifyDnsLength=false`. An `xn--` label must
-decode as valid RFC 3492 Punycode and re-validate; a label that fails, or
-that decodes to all-ASCII, fails the whole URL.
+WHATWG's domain-to-ASCII only runs full UTS #46 processing when the host
+(after percent-decoding) contains a non-ASCII code point. A pure-ASCII host
+takes Node's URL implementation's ASCII fast path instead: it is only
+lowercased. That fast path does NOT decode or re-validate `xn--` labels, so
+a malformed already-ASCII `xn--` label is kept verbatim, lowercased, even
+though UTS #46's domain-to-ASCII would reject it. In `invite.json`,
+`relay "wss://xn--999999999.example/"`, `relay "wss://xn---abc.example/"`,
+`relay "wss://xn--abc-.example/"` and `relay "wss://xn--.example/"` all
+normalise to themselves verbatim.
+
+Once any label in the host is non-ASCII, full UTS #46 processing
+(`Transitional_Processing=false`, `CheckHyphens=false`, `CheckBidi=true`,
+`CheckJoiners=true`, `UseSTD3ASCIIRules=false`, `VerifyDnsLength=false`) runs
+over every label of that host, including its already-ASCII ones - so an
+`xn--` label that was harmless on the pure-ASCII fast path now must decode as
+valid RFC 3492 Punycode and re-validate; a label that fails, or that decodes
+to all-ASCII, fails the whole URL. `relay "wss://xn--999999999.bücher.example/"`
+is rejected (`expected: null`) for exactly this reason: its own label is
+ASCII and malformed, but the sibling `bücher` label forces full UTS #46
+processing over the whole host.
 
 IDNA 2003 implementations (`java.net.IDN`, Python's `encodings.idna`) agree
-with this for ordinary hosts, but differ on the four deviation characters
-(U+00DF, U+03C2, U+200C, U+200D) and on code points unassigned in Unicode 3.2
-(for example U+1E9E). A port without UTS #46 must fail closed on those
-inputs rather than produce a different hash; the reference accepts some of
-them, so such a port must carry an explicit divergence list in its
-conformance test. In `invite.json`, the cases `relay "wss://faß.de/"`,
-`relay "wss://ς.example/"`, `relay "wss://ẞ.example/"` and
-`relay "wss://%C3%9F.example/"` exercise this.
+with UTS #46's non-ASCII path for ordinary hosts, but differ on the four
+deviation characters (U+00DF, U+03C2, U+200C, U+200D) and on code points
+unassigned in Unicode 3.2 (for example U+1E9E). A port without UTS #46 must
+fail closed on those inputs rather than produce a different hash; the
+reference accepts some of them, so such a port must carry an explicit
+divergence list in its conformance test. In `invite.json`, the cases
+`relay "wss://faß.de/"`, `relay "wss://ς.example/"`,
+`relay "wss://ẞ.example/"` and `relay "wss://%C3%9F.example/"` exercise
+this. This deviation-character and unassigned-code-point divergence only
+applies on the non-ASCII path; it does not affect the pure-ASCII fast path
+above.
 
 Java's `IDN.toUnicode` never throws, so it cannot be used to validate
-`xn--` labels; a real Punycode decoder is needed.
+`xn--` labels; a real Punycode decoder is needed, and it must only run on
+the non-ASCII path (see above) - running it over a pure-ASCII host's labels
+too would wrongly reject the malformed-but-verbatim cases.
 
 ## Nostr
 

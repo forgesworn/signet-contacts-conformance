@@ -1,0 +1,32 @@
+name: Notify ports
+
+# When the vectors on main change, ask every port to re-run its conformance
+# tests now rather than at its next scheduled run. Needs a PORTS_DISPATCH_TOKEN
+# secret that can send repository_dispatch to the ports listed below; without
+# it this step is skipped and the ports catch up on their nightly schedule.
+
+on:
+  push:
+    branches: [main]
+    paths: ['vectors/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        port: [forgesworn/signet-contacts-kotlin]
+    steps:
+      - name: Dispatch
+        env:
+          GH_TOKEN: ${{ secrets.PORTS_DISPATCH_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::notice::PORTS_DISPATCH_TOKEN is not set; ${{ matrix.port }} will pick this up on its nightly run."
+            exit 0
+          fi
+          gh api "repos/${{ matrix.port }}/dispatches" -f event_type=conformance-updated -f "client_payload[sha]=${{ github.sha }}"

@@ -1,0 +1,63 @@
+name: Sync with signet-contacts
+
+# Regenerates the vectors from signet-contacts main and opens (or refreshes) a
+# pull request when anything changed. Triggered by signet-contacts on every
+# push to its main branch (repository_dispatch), nightly, or by hand.
+
+on:
+  repository_dispatch:
+    types: [signet-contacts-updated]
+  schedule:
+    - cron: '41 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          repository: forgesworn/signet-contacts
+          ref: main
+          path: .reference
+          persist-credentials: false
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 24
+      - name: Build the reference
+        working-directory: .reference
+        run: npm ci && npm run build
+      - name: Regenerate
+        env:
+          SIGNET_CONTACTS_DIR: .reference
+        run: node scripts/generate.mjs
+      - name: Open or refresh the sync pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- vectors; then
+            echo "Vectors already match signet-contacts main."
+            exit 0
+          fi
+          ref_sha=$(git -C .reference rev-parse --short HEAD)
+          branch=sync/signet-contacts
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$branch"
+          git add vectors
+          git commit -m "chore: sync vectors with signet-contacts $ref_sha"
+          git push --force origin "$branch"
+          if [ -z "$(gh pr list --head "$branch" --state open --json number --jq '.[].number')" ]; then
+            gh pr create --head "$branch" --base main \
+              --title "chore: sync vectors with signet-contacts" \
+              --body "Regenerated from forgesworn/signet-contacts@$ref_sha. Every port's CI runs against these vectors once this merges, so check the diff for wire changes a port must follow."
+          fi

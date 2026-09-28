@@ -1,0 +1,635 @@
+{
+  "description": "parseProposalBatch(plaintext): the parsed batch or null.",
+  "cases": [
+    {
+      "name": "baseline",
+      "plaintext": "{\"v\":1,\"proposals\":[{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000001\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000002\",\"action\":\"rename-app-label\",\"value\":{\"contactId\":\"dddddddddddddddddddddddddddddddd\",\"label\":\"Coach\",\"updatedAt\":5},\"createdAt\":1700000000}]}",
+      "expected": {
+        "v": 1,
+        "proposals": [
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000001",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000002",
+            "action": "rename-app-label",
+            "value": {
+              "contactId": "dddddddddddddddddddddddddddddddd",
+              "label": "Coach",
+              "updatedAt": 5
+            },
+            "createdAt": 1700000000
+          }
+        ]
+      }
+    },
+    {
+      "name": "invalid entries dropped",
+      "plaintext": "{\"v\":1,\"proposals\":[{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000001\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000002\",\"action\":\"remove\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000003\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":-1},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000004\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"\u200b\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000005\",\"action\":\"rename-app-label\",\"value\":{\"contactId\":\"dddddddddddddddddddddddddddddddd\",\"label\":\"L\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000006\",\"action\":\"rename-app-label\",\"value\":{\"contactId\":\"dddddddddddddddddddddddddddddddd\",\"label\":\"L\",\"updatedAt\":1.5},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000007\",\"action\":\"rename-app-label\",\"value\":{\"contactId\":\"dddddddddddddddddddddddddddddddd\",\"label\":\"  llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll\",\"updatedAt\":0},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000008\",\"action\":\"add-ken\",\"value\":[],\"createdAt\":1700000000},null,\"x\"]}",
+      "expected": {
+        "v": 1,
+        "proposals": [
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000007",
+            "action": "rename-app-label",
+            "value": {
+              "contactId": "dddddddddddddddddddddddddddddddd",
+              "label": "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll",
+              "updatedAt": 0
+            },
+            "createdAt": 1700000000
+          }
+        ]
+      }
+    },
+    {
+      "name": "capped at 50",
+      "plaintext": "{\"v\":1,\"proposals\":[{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000001\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000002\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000003\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000004\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000005\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000006\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000007\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000008\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000009\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"0000000000000000000000000000000a\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"0000000000000000000000000000000b\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"0000000000000000000000000000000c\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"0000000000000000000000000000000d\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"0000000000000000000000000000000e\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"0000000000000000000000000000000f\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000010\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000011\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000012\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000013\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000014\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000015\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000016\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000017\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000018\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000019\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"0000000000000000000000000000001a\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"0000000000000000000000000000001b\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"0000000000000000000000000000001c\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"0000000000000000000000000000001d\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"0000000000000000000000000000001e\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"0000000000000000000000000000001f\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000020\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000021\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000022\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000023\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000024\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000025\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000026\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000027\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000028\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000029\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"0000000000000000000000000000002a\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"0000000000000000000000000000002b\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"0000000000000000000000000000002c\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"0000000000000000000000000000002d\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"0000000000000000000000000000002e\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"0000000000000000000000000000002f\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000030\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000031\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000032\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000},{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000033\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000}]}",
+      "expected": {
+        "v": 1,
+        "proposals": [
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000001",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000002",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000003",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000004",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000005",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000006",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000007",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000008",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000009",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "0000000000000000000000000000000a",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "0000000000000000000000000000000b",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "0000000000000000000000000000000c",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "0000000000000000000000000000000d",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "0000000000000000000000000000000e",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "0000000000000000000000000000000f",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000010",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000011",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000012",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000013",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000014",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000015",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000016",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000017",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000018",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000019",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "0000000000000000000000000000001a",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "0000000000000000000000000000001b",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "0000000000000000000000000000001c",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "0000000000000000000000000000001d",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "0000000000000000000000000000001e",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "0000000000000000000000000000001f",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000020",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000021",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000022",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000023",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000024",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000025",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000026",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000027",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000028",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000029",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "0000000000000000000000000000002a",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "0000000000000000000000000000002b",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "0000000000000000000000000000002c",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "0000000000000000000000000000002d",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "0000000000000000000000000000002e",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "0000000000000000000000000000002f",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000030",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000031",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          },
+          {
+            "v": 1,
+            "grantId": "ffffffffffffffffffffffffffffffff",
+            "operationId": "00000000000000000000000000000032",
+            "action": "add-ken",
+            "value": {
+              "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "displayName": "Ada"
+            },
+            "createdAt": 1700000000
+          }
+        ]
+      }
+    },
+    {
+      "name": "v2 batch",
+      "plaintext": "{\"v\":2,\"proposals\":[{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"00000000000000000000000000000001\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000}]}",
+      "expected": null
+    },
+    {
+      "name": "proposals not an array",
+      "plaintext": "{\"v\":1,\"proposals\":{}}",
+      "expected": null
+    },
+    {
+      "name": "empty batch parses",
+      "plaintext": "{\"v\":1,\"proposals\":[]}",
+      "expected": {
+        "v": 1,
+        "proposals": []
+      }
+    }
+  ]
+}

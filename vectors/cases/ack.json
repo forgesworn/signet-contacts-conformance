@@ -1,0 +1,272 @@
+{
+  "description": "parsePairingAckV2(plaintext, expectedChallenge): the parsed ack or null.",
+  "expectedChallenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+  "cases": [
+    {
+      "name": "baseline",
+      "plaintext": "{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"railPubkey\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"projectionTag\":\"5d65155161ef7e713af3bf7bc7b213d0\",\"proposalTag\":\"2713fc461de3b92ac3da773f33926f3d\",\"relay\":\"wss://relay.example.com\",\"grantedCapabilities\":[\"signet.contacts.read:directory\",\"signet.contacts.blocks.read\"],\"maxStalenessSeconds\":21600,\"challenge\":\"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\"}",
+      "expected": {
+        "v": 2,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "railPubkey": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "projectionTag": "5d65155161ef7e713af3bf7bc7b213d0",
+        "proposalTag": "2713fc461de3b92ac3da773f33926f3d",
+        "relay": "wss://relay.example.com",
+        "grantedCapabilities": [
+          "signet.contacts.read:directory",
+          "signet.contacts.blocks.read"
+        ],
+        "maxStalenessSeconds": 21600,
+        "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+      }
+    },
+    {
+      "name": "v as 2.0",
+      "plaintext": "{\"v\":2.0,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"railPubkey\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"projectionTag\":\"5d65155161ef7e713af3bf7bc7b213d0\",\"proposalTag\":\"2713fc461de3b92ac3da773f33926f3d\",\"relay\":\"wss://relay.example.com\",\"grantedCapabilities\":[\"signet.contacts.read:directory\",\"signet.contacts.blocks.read\"],\"maxStalenessSeconds\":21600,\"challenge\":\"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\"}",
+      "expected": {
+        "v": 2,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "railPubkey": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "projectionTag": "5d65155161ef7e713af3bf7bc7b213d0",
+        "proposalTag": "2713fc461de3b92ac3da773f33926f3d",
+        "relay": "wss://relay.example.com",
+        "grantedCapabilities": [
+          "signet.contacts.read:directory",
+          "signet.contacts.blocks.read"
+        ],
+        "maxStalenessSeconds": 21600,
+        "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+      }
+    },
+    {
+      "name": "v as string",
+      "plaintext": "{\"v\":\"2\",\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"railPubkey\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"projectionTag\":\"5d65155161ef7e713af3bf7bc7b213d0\",\"proposalTag\":\"2713fc461de3b92ac3da773f33926f3d\",\"relay\":\"wss://relay.example.com\",\"grantedCapabilities\":[\"signet.contacts.read:directory\",\"signet.contacts.blocks.read\"],\"maxStalenessSeconds\":21600,\"challenge\":\"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\"}",
+      "expected": null
+    },
+    {
+      "name": "v1 ack",
+      "plaintext": "{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"railPubkey\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"projectionTag\":\"5d65155161ef7e713af3bf7bc7b213d0\",\"proposalTag\":\"2713fc461de3b92ac3da773f33926f3d\",\"relay\":\"wss://relay.example.com\",\"grantedCapabilities\":[\"signet.contacts.read:directory\",\"signet.contacts.blocks.read\"],\"maxStalenessSeconds\":21600,\"challenge\":\"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\"}",
+      "expected": null
+    },
+    {
+      "name": "challenge case differs",
+      "plaintext": "{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"railPubkey\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"projectionTag\":\"5d65155161ef7e713af3bf7bc7b213d0\",\"proposalTag\":\"2713fc461de3b92ac3da773f33926f3d\",\"relay\":\"wss://relay.example.com\",\"grantedCapabilities\":[\"signet.contacts.read:directory\",\"signet.contacts.blocks.read\"],\"maxStalenessSeconds\":21600,\"challenge\":\"dddddddddddddddddddddddddddddddd\"}",
+      "expected": null
+    },
+    {
+      "name": "duplicate challenge key, last wins",
+      "plaintext": "{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"railPubkey\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"projectionTag\":\"5d65155161ef7e713af3bf7bc7b213d0\",\"proposalTag\":\"2713fc461de3b92ac3da773f33926f3d\",\"relay\":\"wss://relay.example.com\",\"grantedCapabilities\":[\"signet.contacts.read:directory\",\"signet.contacts.blocks.read\"],\"maxStalenessSeconds\":21600,\"challenge\":\"x\",\"challenge\":\"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\"}",
+      "expected": {
+        "v": 2,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "railPubkey": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "projectionTag": "5d65155161ef7e713af3bf7bc7b213d0",
+        "proposalTag": "2713fc461de3b92ac3da773f33926f3d",
+        "relay": "wss://relay.example.com",
+        "grantedCapabilities": [
+          "signet.contacts.read:directory",
+          "signet.contacts.blocks.read"
+        ],
+        "maxStalenessSeconds": 21600,
+        "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+      }
+    },
+    {
+      "name": "grantId uppercase",
+      "plaintext": "{\"v\":2,\"grantId\":\"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF\",\"railPubkey\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"projectionTag\":\"5d65155161ef7e713af3bf7bc7b213d0\",\"proposalTag\":\"2713fc461de3b92ac3da773f33926f3d\",\"relay\":\"wss://relay.example.com\",\"grantedCapabilities\":[\"signet.contacts.read:directory\",\"signet.contacts.blocks.read\"],\"maxStalenessSeconds\":21600,\"challenge\":\"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\"}",
+      "expected": null
+    },
+    {
+      "name": "plaintext relay",
+      "plaintext": "{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"railPubkey\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"projectionTag\":\"5d65155161ef7e713af3bf7bc7b213d0\",\"proposalTag\":\"2713fc461de3b92ac3da773f33926f3d\",\"relay\":\"ws://relay.example.com\",\"grantedCapabilities\":[\"signet.contacts.read:directory\",\"signet.contacts.blocks.read\"],\"maxStalenessSeconds\":21600,\"challenge\":\"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\"}",
+      "expected": null
+    },
+    {
+      "name": "unknown capability dropped",
+      "plaintext": "{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"railPubkey\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"projectionTag\":\"5d65155161ef7e713af3bf7bc7b213d0\",\"proposalTag\":\"2713fc461de3b92ac3da773f33926f3d\",\"relay\":\"wss://relay.example.com\",\"grantedCapabilities\":[\"signet.contacts.blocks.read\",\"x\",7,\"signet.contacts.read:directory\"],\"maxStalenessSeconds\":21600,\"challenge\":\"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\"}",
+      "expected": {
+        "v": 2,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "railPubkey": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "projectionTag": "5d65155161ef7e713af3bf7bc7b213d0",
+        "proposalTag": "2713fc461de3b92ac3da773f33926f3d",
+        "relay": "wss://relay.example.com",
+        "grantedCapabilities": [
+          "signet.contacts.read:directory",
+          "signet.contacts.blocks.read"
+        ],
+        "maxStalenessSeconds": 21600,
+        "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+      }
+    },
+    {
+      "name": "only unknown capabilities",
+      "plaintext": "{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"railPubkey\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"projectionTag\":\"5d65155161ef7e713af3bf7bc7b213d0\",\"proposalTag\":\"2713fc461de3b92ac3da773f33926f3d\",\"relay\":\"wss://relay.example.com\",\"grantedCapabilities\":[\"x\"],\"maxStalenessSeconds\":21600,\"challenge\":\"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\"}",
+      "expected": null
+    },
+    {
+      "name": "capabilities not an array",
+      "plaintext": "{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"railPubkey\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"projectionTag\":\"5d65155161ef7e713af3bf7bc7b213d0\",\"proposalTag\":\"2713fc461de3b92ac3da773f33926f3d\",\"relay\":\"wss://relay.example.com\",\"grantedCapabilities\":\"signet.contacts.read:directory\",\"maxStalenessSeconds\":21600,\"challenge\":\"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\"}",
+      "expected": null
+    },
+    {
+      "name": "staleness below the band",
+      "plaintext": "{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"railPubkey\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"projectionTag\":\"5d65155161ef7e713af3bf7bc7b213d0\",\"proposalTag\":\"2713fc461de3b92ac3da773f33926f3d\",\"relay\":\"wss://relay.example.com\",\"grantedCapabilities\":[\"signet.contacts.read:directory\",\"signet.contacts.blocks.read\"],\"maxStalenessSeconds\":10,\"challenge\":\"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\"}",
+      "expected": {
+        "v": 2,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "railPubkey": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "projectionTag": "5d65155161ef7e713af3bf7bc7b213d0",
+        "proposalTag": "2713fc461de3b92ac3da773f33926f3d",
+        "relay": "wss://relay.example.com",
+        "grantedCapabilities": [
+          "signet.contacts.read:directory",
+          "signet.contacts.blocks.read"
+        ],
+        "maxStalenessSeconds": 3600,
+        "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+      }
+    },
+    {
+      "name": "staleness above the band",
+      "plaintext": "{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"railPubkey\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"projectionTag\":\"5d65155161ef7e713af3bf7bc7b213d0\",\"proposalTag\":\"2713fc461de3b92ac3da773f33926f3d\",\"relay\":\"wss://relay.example.com\",\"grantedCapabilities\":[\"signet.contacts.read:directory\",\"signet.contacts.blocks.read\"],\"maxStalenessSeconds\":1000000000,\"challenge\":\"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\"}",
+      "expected": {
+        "v": 2,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "railPubkey": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "projectionTag": "5d65155161ef7e713af3bf7bc7b213d0",
+        "proposalTag": "2713fc461de3b92ac3da773f33926f3d",
+        "relay": "wss://relay.example.com",
+        "grantedCapabilities": [
+          "signet.contacts.read:directory",
+          "signet.contacts.blocks.read"
+        ],
+        "maxStalenessSeconds": 604800,
+        "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+      }
+    },
+    {
+      "name": "staleness fractional",
+      "plaintext": "{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"railPubkey\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"projectionTag\":\"5d65155161ef7e713af3bf7bc7b213d0\",\"proposalTag\":\"2713fc461de3b92ac3da773f33926f3d\",\"relay\":\"wss://relay.example.com\",\"grantedCapabilities\":[\"signet.contacts.read:directory\",\"signet.contacts.blocks.read\"],\"maxStalenessSeconds\":7200.9,\"challenge\":\"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\"}",
+      "expected": {
+        "v": 2,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "railPubkey": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "projectionTag": "5d65155161ef7e713af3bf7bc7b213d0",
+        "proposalTag": "2713fc461de3b92ac3da773f33926f3d",
+        "relay": "wss://relay.example.com",
+        "grantedCapabilities": [
+          "signet.contacts.read:directory",
+          "signet.contacts.blocks.read"
+        ],
+        "maxStalenessSeconds": 7200,
+        "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+      }
+    },
+    {
+      "name": "staleness a string",
+      "plaintext": "{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"railPubkey\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"projectionTag\":\"5d65155161ef7e713af3bf7bc7b213d0\",\"proposalTag\":\"2713fc461de3b92ac3da773f33926f3d\",\"relay\":\"wss://relay.example.com\",\"grantedCapabilities\":[\"signet.contacts.read:directory\",\"signet.contacts.blocks.read\"],\"maxStalenessSeconds\":\"7200\",\"challenge\":\"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\"}",
+      "expected": {
+        "v": 2,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "railPubkey": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "projectionTag": "5d65155161ef7e713af3bf7bc7b213d0",
+        "proposalTag": "2713fc461de3b92ac3da773f33926f3d",
+        "relay": "wss://relay.example.com",
+        "grantedCapabilities": [
+          "signet.contacts.read:directory",
+          "signet.contacts.blocks.read"
+        ],
+        "maxStalenessSeconds": 21600,
+        "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+      }
+    },
+    {
+      "name": "staleness negative",
+      "plaintext": "{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"railPubkey\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"projectionTag\":\"5d65155161ef7e713af3bf7bc7b213d0\",\"proposalTag\":\"2713fc461de3b92ac3da773f33926f3d\",\"relay\":\"wss://relay.example.com\",\"grantedCapabilities\":[\"signet.contacts.read:directory\",\"signet.contacts.blocks.read\"],\"maxStalenessSeconds\":-5,\"challenge\":\"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\"}",
+      "expected": {
+        "v": 2,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "railPubkey": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "projectionTag": "5d65155161ef7e713af3bf7bc7b213d0",
+        "proposalTag": "2713fc461de3b92ac3da773f33926f3d",
+        "relay": "wss://relay.example.com",
+        "grantedCapabilities": [
+          "signet.contacts.read:directory",
+          "signet.contacts.blocks.read"
+        ],
+        "maxStalenessSeconds": 21600,
+        "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+      }
+    },
+    {
+      "name": "staleness missing",
+      "plaintext": "{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"railPubkey\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"projectionTag\":\"5d65155161ef7e713af3bf7bc7b213d0\",\"proposalTag\":\"2713fc461de3b92ac3da773f33926f3d\",\"relay\":\"wss://relay.example.com\",\"grantedCapabilities\":[\"signet.contacts.read:directory\",\"signet.contacts.blocks.read\"],\"challenge\":\"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\"}",
+      "expected": {
+        "v": 2,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "railPubkey": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "projectionTag": "5d65155161ef7e713af3bf7bc7b213d0",
+        "proposalTag": "2713fc461de3b92ac3da773f33926f3d",
+        "relay": "wss://relay.example.com",
+        "grantedCapabilities": [
+          "signet.contacts.read:directory",
+          "signet.contacts.blocks.read"
+        ],
+        "maxStalenessSeconds": 21600,
+        "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+      }
+    },
+    {
+      "name": "extra fields ignored",
+      "plaintext": "{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"railPubkey\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"projectionTag\":\"5d65155161ef7e713af3bf7bc7b213d0\",\"proposalTag\":\"2713fc461de3b92ac3da773f33926f3d\",\"relay\":\"wss://relay.example.com\",\"grantedCapabilities\":[\"signet.contacts.read:directory\",\"signet.contacts.blocks.read\"],\"maxStalenessSeconds\":21600,\"challenge\":\"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\",\"extra\":{\"nested\":[1,2]}}",
+      "expected": {
+        "v": 2,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "railPubkey": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "projectionTag": "5d65155161ef7e713af3bf7bc7b213d0",
+        "proposalTag": "2713fc461de3b92ac3da773f33926f3d",
+        "relay": "wss://relay.example.com",
+        "grantedCapabilities": [
+          "signet.contacts.read:directory",
+          "signet.contacts.blocks.read"
+        ],
+        "maxStalenessSeconds": 21600,
+        "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+      }
+    },
+    {
+      "name": "not JSON",
+      "plaintext": "not json",
+      "expected": null
+    },
+    {
+      "name": "a JSON array",
+      "plaintext": "[]",
+      "expected": null
+    },
+    {
+      "name": "JSON null",
+      "plaintext": "null",
+      "expected": null
+    },
+    {
+      "name": "surrounding whitespace",
+      "plaintext": " \n{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"railPubkey\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"projectionTag\":\"5d65155161ef7e713af3bf7bc7b213d0\",\"proposalTag\":\"2713fc461de3b92ac3da773f33926f3d\",\"relay\":\"wss://relay.example.com\",\"grantedCapabilities\":[\"signet.contacts.read:directory\",\"signet.contacts.blocks.read\"],\"maxStalenessSeconds\":21600,\"challenge\":\"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\"}\t",
+      "expected": {
+        "v": 2,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "railPubkey": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "projectionTag": "5d65155161ef7e713af3bf7bc7b213d0",
+        "proposalTag": "2713fc461de3b92ac3da773f33926f3d",
+        "relay": "wss://relay.example.com",
+        "grantedCapabilities": [
+          "signet.contacts.read:directory",
+          "signet.contacts.blocks.read"
+        ],
+        "maxStalenessSeconds": 21600,
+        "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+      }
+    }
+  ]
+}

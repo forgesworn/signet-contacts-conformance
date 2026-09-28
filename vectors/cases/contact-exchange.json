@@ -1,0 +1,102 @@
+{
+  "description": "parseContactExchangeMessage(raw) and, where it parses, contactMessageHash of the result.",
+  "cases": [
+    {
+      "name": "plain request",
+      "raw": "{\"v\":1,\"type\":\"signet-contact-request\",\"id\":\"44444444444444444444444444444444\",\"from\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"to\":\"2222222222222222222222222222222222222222222222222222222222222222\",\"createdAt\":1700000000,\"expiresAt\":1700000060,\"commitment\":\"11dfd8049812007ef02bfb41603b9ba04f0bc9e81cfe5b5e044798714ce62d3a\",\"reply\":{\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"wss://relay.example.com\"]}}",
+      "expected": {
+        "v": 1,
+        "id": "44444444444444444444444444444444",
+        "from": "1111111111111111111111111111111111111111111111111111111111111111",
+        "to": "2222222222222222222222222222222222222222222222222222222222222222",
+        "createdAt": 1700000000,
+        "type": "signet-contact-request",
+        "expiresAt": 1700000060,
+        "commitment": "11dfd8049812007ef02bfb41603b9ba04f0bc9e81cfe5b5e044798714ce62d3a",
+        "reply": {
+          "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "relays": [
+            "wss://relay.example.com/"
+          ]
+        }
+      },
+      "hash": "97935624b5eac74185da866074303cd72f12991d555f6aa1f37fb9fd68339682"
+    },
+    {
+      "name": "relays normalised before hashing",
+      "raw": "{\"v\":1,\"type\":\"signet-contact-request\",\"id\":\"44444444444444444444444444444444\",\"from\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"to\":\"2222222222222222222222222222222222222222222222222222222222222222\",\"createdAt\":1700000000,\"expiresAt\":1700000060,\"commitment\":\"11dfd8049812007ef02bfb41603b9ba04f0bc9e81cfe5b5e044798714ce62d3a\",\"reply\":{\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"WSS://Relay.Example.COM:443\",\"wss://relay.example.com/\",\"wss://[::FFFF:1.2.3.4]/a/../b c\"]}}",
+      "expected": {
+        "v": 1,
+        "id": "44444444444444444444444444444444",
+        "from": "1111111111111111111111111111111111111111111111111111111111111111",
+        "to": "2222222222222222222222222222222222222222222222222222222222222222",
+        "createdAt": 1700000000,
+        "type": "signet-contact-request",
+        "expiresAt": 1700000060,
+        "commitment": "11dfd8049812007ef02bfb41603b9ba04f0bc9e81cfe5b5e044798714ce62d3a",
+        "reply": {
+          "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "relays": [
+            "wss://relay.example.com/",
+            "wss://[::ffff:102:304]/b%20c"
+          ]
+        }
+      },
+      "hash": "cf208546186b337a09a4002ddac844fd31d12363f18e2cc00904f6ab41d005eb"
+    },
+    {
+      "name": "keys in another order hash the same",
+      "raw": "{\"reply\":{\"relays\":[\"wss://relay.example.com\"],\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"},\"commitment\":\"11dfd8049812007ef02bfb41603b9ba04f0bc9e81cfe5b5e044798714ce62d3a\",\"expiresAt\":1700000060,\"createdAt\":1700000000,\"to\":\"2222222222222222222222222222222222222222222222222222222222222222\",\"from\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"id\":\"44444444444444444444444444444444\",\"type\":\"signet-contact-request\",\"v\":1}",
+      "expected": {
+        "v": 1,
+        "id": "44444444444444444444444444444444",
+        "from": "1111111111111111111111111111111111111111111111111111111111111111",
+        "to": "2222222222222222222222222222222222222222222222222222222222222222",
+        "createdAt": 1700000000,
+        "type": "signet-contact-request",
+        "expiresAt": 1700000060,
+        "commitment": "11dfd8049812007ef02bfb41603b9ba04f0bc9e81cfe5b5e044798714ce62d3a",
+        "reply": {
+          "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "relays": [
+            "wss://relay.example.com/"
+          ]
+        }
+      },
+      "hash": "97935624b5eac74185da866074303cd72f12991d555f6aa1f37fb9fd68339682"
+    },
+    {
+      "name": "from equals to",
+      "raw": "{\"v\":1,\"type\":\"signet-contact-request\",\"id\":\"44444444444444444444444444444444\",\"from\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"to\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"createdAt\":1700000000,\"expiresAt\":1700000060,\"commitment\":\"11dfd8049812007ef02bfb41603b9ba04f0bc9e81cfe5b5e044798714ce62d3a\",\"reply\":{\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"wss://r.example\"]}}",
+      "expected": null,
+      "hash": null
+    },
+    {
+      "name": "ttl over 30 days",
+      "raw": "{\"v\":1,\"type\":\"signet-contact-request\",\"id\":\"44444444444444444444444444444444\",\"from\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"to\":\"2222222222222222222222222222222222222222222222222222222222222222\",\"createdAt\":1700000000,\"expiresAt\":1702592001,\"commitment\":\"11dfd8049812007ef02bfb41603b9ba04f0bc9e81cfe5b5e044798714ce62d3a\",\"reply\":{\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"wss://r.example\"]}}",
+      "expected": null,
+      "hash": null
+    },
+    {
+      "name": "acceptance",
+      "raw": "{\"v\":1,\"type\":\"signet-contact-accept\",\"id\":\"44444444444444444444444444444444\",\"from\":\"2222222222222222222222222222222222222222222222222222222222222222\",\"to\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"createdAt\":1700000000,\"requestHash\":\"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee\",\"nonce\":\"3333333333333333333333333333333333333333333333333333333333333333\"}",
+      "expected": {
+        "v": 1,
+        "id": "44444444444444444444444444444444",
+        "from": "2222222222222222222222222222222222222222222222222222222222222222",
+        "to": "1111111111111111111111111111111111111111111111111111111111111111",
+        "createdAt": 1700000000,
+        "type": "signet-contact-accept",
+        "requestHash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "nonce": "3333333333333333333333333333333333333333333333333333333333333333"
+      },
+      "hash": "7acd6b223b34a32d28bd5c14ff6ab515191b5faf38d29188f697a41bc511fa5a"
+    },
+    {
+      "name": "reveal missing acceptanceHash",
+      "raw": "{\"v\":1,\"type\":\"signet-contact-reveal\",\"id\":\"44444444444444444444444444444444\",\"from\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"to\":\"2222222222222222222222222222222222222222222222222222222222222222\",\"createdAt\":1700000000,\"requestHash\":\"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee\",\"nonce\":\"3333333333333333333333333333333333333333333333333333333333333333\"}",
+      "expected": null,
+      "hash": null
+    }
+  ]
+}

@@ -1,0 +1,256 @@
+{
+  "description": "parseAppInviteRequest(json, now) and parseAppInviteReply(json, request, now).",
+  "requests": [
+    {
+      "name": "create single-use",
+      "json": "{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"requestId\":\"55555555555555555555555555555555\",\"createdAt\":1700000000,\"action\":\"create-invite\",\"mode\":\"single-use\"}",
+      "now": 1700000010,
+      "expected": {
+        "v": 1,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "requestId": "55555555555555555555555555555555",
+        "createdAt": 1700000000,
+        "action": "create-invite",
+        "mode": "single-use"
+      }
+    },
+    {
+      "name": "create standing",
+      "json": "{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"requestId\":\"55555555555555555555555555555555\",\"createdAt\":1700000000,\"action\":\"create-invite\",\"mode\":\"standing\"}",
+      "now": 1700000000,
+      "expected": {
+        "v": 1,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "requestId": "55555555555555555555555555555555",
+        "createdAt": 1700000000,
+        "action": "create-invite",
+        "mode": "standing"
+      }
+    },
+    {
+      "name": "create without mode",
+      "json": "{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"requestId\":\"55555555555555555555555555555555\",\"createdAt\":1700000000,\"action\":\"create-invite\"}",
+      "now": 1700000000,
+      "expected": null
+    },
+    {
+      "name": "create with an invite",
+      "json": "{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"requestId\":\"55555555555555555555555555555555\",\"createdAt\":1700000000,\"action\":\"create-invite\",\"mode\":\"standing\",\"invite\":{\"v\":1,\"recipient\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"WSS://R.example\"]}}",
+      "now": 1700000000,
+      "expected": null
+    },
+    {
+      "name": "receive",
+      "json": "{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"requestId\":\"55555555555555555555555555555555\",\"createdAt\":1700000000,\"action\":\"receive-invite\",\"invite\":{\"v\":1,\"recipient\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"WSS://R.example\"]}}",
+      "now": 1700000000,
+      "expected": {
+        "v": 1,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "requestId": "55555555555555555555555555555555",
+        "createdAt": 1700000000,
+        "action": "receive-invite",
+        "invite": {
+          "v": 1,
+          "recipient": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "relays": [
+            "wss://r.example/"
+          ]
+        }
+      }
+    },
+    {
+      "name": "receive with a mode",
+      "json": "{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"requestId\":\"55555555555555555555555555555555\",\"createdAt\":1700000000,\"action\":\"receive-invite\",\"mode\":\"standing\",\"invite\":{\"v\":1,\"recipient\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"WSS://R.example\"]}}",
+      "now": 1700000000,
+      "expected": null
+    },
+    {
+      "name": "receive without an invite",
+      "json": "{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"requestId\":\"55555555555555555555555555555555\",\"createdAt\":1700000000,\"action\":\"receive-invite\"}",
+      "now": 1700000000,
+      "expected": null
+    },
+    {
+      "name": "from the future",
+      "json": "{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"requestId\":\"55555555555555555555555555555555\",\"createdAt\":1700000000,\"action\":\"create-invite\",\"mode\":\"standing\"}",
+      "now": 1699999999,
+      "expected": null
+    },
+    {
+      "name": "expired",
+      "json": "{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"requestId\":\"55555555555555555555555555555555\",\"createdAt\":1700000000,\"action\":\"create-invite\",\"mode\":\"standing\"}",
+      "now": 1700000300,
+      "expected": null
+    }
+  ],
+  "replies": [
+    {
+      "name": "issued",
+      "request": {
+        "v": 1,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "requestId": "55555555555555555555555555555555",
+        "createdAt": 1700000000,
+        "action": "create-invite",
+        "mode": "standing"
+      },
+      "json": "{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"requestId\":\"55555555555555555555555555555555\",\"createdAt\":1700000000,\"status\":\"issued\",\"invite\":{\"v\":1,\"recipient\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"WSS://R.example\"]}}",
+      "now": 1700000005,
+      "expected": {
+        "v": 1,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "requestId": "55555555555555555555555555555555",
+        "createdAt": 1700000000,
+        "status": "issued",
+        "invite": {
+          "v": 1,
+          "recipient": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "relays": [
+            "wss://r.example/"
+          ]
+        }
+      }
+    },
+    {
+      "name": "issued without an invite",
+      "request": {
+        "v": 1,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "requestId": "55555555555555555555555555555555",
+        "createdAt": 1700000000,
+        "action": "create-invite",
+        "mode": "standing"
+      },
+      "json": "{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"requestId\":\"55555555555555555555555555555555\",\"createdAt\":1700000000,\"status\":\"issued\"}",
+      "now": 1700000005,
+      "expected": null
+    },
+    {
+      "name": "queued for a create",
+      "request": {
+        "v": 1,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "requestId": "55555555555555555555555555555555",
+        "createdAt": 1700000000,
+        "action": "create-invite",
+        "mode": "standing"
+      },
+      "json": "{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"requestId\":\"55555555555555555555555555555555\",\"createdAt\":1700000000,\"status\":\"queued\"}",
+      "now": 1700000005,
+      "expected": null
+    },
+    {
+      "name": "queued",
+      "request": {
+        "v": 1,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "requestId": "55555555555555555555555555555555",
+        "createdAt": 1700000000,
+        "action": "receive-invite",
+        "invite": {
+          "v": 1,
+          "recipient": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "relays": [
+            "wss://r.example/"
+          ]
+        }
+      },
+      "json": "{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"requestId\":\"55555555555555555555555555555555\",\"createdAt\":1700000000,\"status\":\"queued\"}",
+      "now": 1700000005,
+      "expected": {
+        "v": 1,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "requestId": "55555555555555555555555555555555",
+        "createdAt": 1700000000,
+        "status": "queued"
+      }
+    },
+    {
+      "name": "queued with an invite",
+      "request": {
+        "v": 1,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "requestId": "55555555555555555555555555555555",
+        "createdAt": 1700000000,
+        "action": "receive-invite",
+        "invite": {
+          "v": 1,
+          "recipient": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "relays": [
+            "wss://r.example/"
+          ]
+        }
+      },
+      "json": "{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"requestId\":\"55555555555555555555555555555555\",\"createdAt\":1700000000,\"status\":\"queued\",\"invite\":{\"v\":1,\"recipient\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"WSS://R.example\"]}}",
+      "now": 1700000005,
+      "expected": null
+    },
+    {
+      "name": "other request id",
+      "request": {
+        "v": 1,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "requestId": "55555555555555555555555555555555",
+        "createdAt": 1700000000,
+        "action": "receive-invite",
+        "invite": {
+          "v": 1,
+          "recipient": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "relays": [
+            "wss://r.example/"
+          ]
+        }
+      },
+      "json": "{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"requestId\":\"66666666666666666666666666666666\",\"createdAt\":1700000000,\"status\":\"queued\"}",
+      "now": 1700000005,
+      "expected": null
+    },
+    {
+      "name": "reply older than the request",
+      "request": {
+        "v": 1,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "requestId": "55555555555555555555555555555555",
+        "createdAt": 1700000000,
+        "action": "receive-invite",
+        "invite": {
+          "v": 1,
+          "recipient": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "relays": [
+            "wss://r.example/"
+          ]
+        }
+      },
+      "json": "{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"requestId\":\"55555555555555555555555555555555\",\"createdAt\":1699999999,\"status\":\"queued\"}",
+      "now": 1700000005,
+      "expected": null
+    },
+    {
+      "name": "window closed",
+      "request": {
+        "v": 1,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "requestId": "55555555555555555555555555555555",
+        "createdAt": 1700000000,
+        "action": "receive-invite",
+        "invite": {
+          "v": 1,
+          "recipient": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "relays": [
+            "wss://r.example/"
+          ]
+        }
+      },
+      "json": "{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"requestId\":\"55555555555555555555555555555555\",\"createdAt\":1700000000,\"status\":\"queued\"}",
+      "now": 1700000300,
+      "expected": null
+    }
+  ]
+}

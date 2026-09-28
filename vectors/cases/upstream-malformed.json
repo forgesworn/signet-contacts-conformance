@@ -1,0 +1,75 @@
+{
+  "description": "What the reference parser returns for each entry of the upstream vectors' `malformed` (and `uncovered`) arrays.",
+  "projection": [
+    {
+      "plaintext": "{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\"}",
+      "expected": null
+    },
+    {
+      "plaintext": "{\"v\":2,\"grantId\":\"short\",\"scopes\":[],\"frontier\":{\"maxClock\":1,\"opCount\":1,\"publishedAt\":1,\"deviceId\":\"22222222222222222222222222222222\"},\"issuedAt\":1,\"expiresAt\":2,\"contacts\":[]}",
+      "expected": null
+    },
+    {
+      "plaintext": "{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"ownerPubkey\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"scopes\":[],\"frontier\":{\"maxClock\":1,\"opCount\":1,\"publishedAt\":1,\"deviceId\":\"22222222222222222222222222222222\"},\"issuedAt\":1,\"expiresAt\":2,\"contacts\":[]}",
+      "expected": {
+        "v": 2,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "scopes": [],
+        "frontier": {
+          "maxClock": 1,
+          "opCount": 1,
+          "publishedAt": 1,
+          "deviceId": "22222222222222222222222222222222"
+        },
+        "issuedAt": 1,
+        "expiresAt": 2,
+        "contacts": []
+      }
+    },
+    {
+      "plaintext": "[]",
+      "expected": null
+    },
+    {
+      "plaintext": "{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"scopes\":[\"signet.contacts.read:directory\"],\"frontier\":{\"maxClock\":1,\"opCount\":1,\"publishedAt\":1,\"deviceId\":\"22222222222222222222222222222222\"},\"issuedAt\":1,\"expiresAt\":2,\"contacts\":[{\"contactId\":\"13993eeedd697109d6e61088138dc959\",\"displayName\":\"Ada\",\"effectiveTier\":\"kith\"}]}",
+      "expected": null
+    },
+    {
+      "plaintext": "{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"scopes\":[\"signet.contacts.read:directory\"],\"frontier\":{\"maxClock\":1,\"opCount\":1,\"publishedAt\":1,\"deviceId\":\"22222222222222222222222222222222\"},\"issuedAt\":1,\"expiresAt\":2,\"contacts\":[{\"contactId\":\"13993eeedd697109d6e61088138dc959\",\"identities\":[{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"verification\":\"proven\"}]}]}",
+      "expected": null
+    },
+    {
+      "plaintext": "{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"scopes\":[\"signet.contacts.read:directory\",\"signet.contacts.read:method:email\"],\"frontier\":{\"maxClock\":1,\"opCount\":1,\"publishedAt\":1,\"deviceId\":\"22222222222222222222222222222222\"},\"issuedAt\":1,\"expiresAt\":2,\"contacts\":[{\"contactId\":\"13993eeedd697109d6e61088138dc959\",\"contactMethods\":[{\"kind\":\"phone\",\"value\":\"+441234567890\"}]}]}",
+      "expected": null
+    },
+    {
+      "plaintext": "{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"scopes\":[\"signet.contacts.read:directory\",\"signet.contacts.read:checks\"],\"frontier\":{\"maxClock\":1,\"opCount\":1,\"publishedAt\":1,\"deviceId\":\"22222222222222222222222222222222\"},\"issuedAt\":1,\"expiresAt\":2,\"contacts\":[{\"contactId\":\"13993eeedd697109d6e61088138dc959\",\"checks\":[{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"method\":\"words\",\"checkedAt\":1}]}]}",
+      "expected": null
+    },
+    {
+      "plaintext": "{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"scopes\":[\"signet.contacts.blocks.read\"],\"frontier\":{\"maxClock\":1,\"opCount\":1,\"publishedAt\":1,\"deviceId\":\"22222222222222222222222222222222\"},\"issuedAt\":1,\"expiresAt\":2,\"contacts\":[{\"contactId\":\"13993eeedd697109d6e61088138dc959\",\"blocked\":false}]}",
+      "expected": null
+    },
+    {
+      "plaintext": "{\"v\":2,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"scopes\":[\"signet.contacts.read:directory\"],\"frontier\":{\"maxClock\":1,\"opCount\":1,\"publishedAt\":1,\"deviceId\":\"22222222222222222222222222222222\"},\"issuedAt\":1,\"expiresAt\":2,\"contacts\":[{\"contactId\":\"13993eeedd697109d6e61088138dc959\",\"avatar\":{\"url\":\"https://x.example/a\",\"hash\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\"}}]}",
+      "expected": null
+    }
+  ],
+  "proposal": [
+    {
+      "plaintext": "{\"v\":2,\"proposals\":[]}",
+      "expected": null
+    },
+    {
+      "plaintext": "{\"v\":1}",
+      "expected": null
+    },
+    {
+      "plaintext": "{\"v\":1,\"proposals\":[{\"v\":1,\"grantId\":\"ffffffffffffffffffffffffffffffff\",\"operationId\":\"short\",\"action\":\"add-ken\",\"value\":{\"pubkey\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"displayName\":\"Ada\"},\"createdAt\":1700000000}]}",
+      "expected": {
+        "v": 1,
+        "proposals": []
+      }
+    }
+  ]
+}

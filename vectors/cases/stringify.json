@@ -1,0 +1,149 @@
+{
+  "description": "JSON.stringify(JSON.parse(input)): number formatting, string escaping, duplicate keys (first position, last value) and whitespace.",
+  "cases": [
+    {
+      "input": "\"plain\"",
+      "output": "\"plain\""
+    },
+    {
+      "input": "\"quote \\\" backslash \\\\ slash \\/\"",
+      "output": "\"quote \\\" backslash \\\\ slash /\""
+    },
+    {
+      "input": "\"\\u0000\\u0001\\u001f\\u007f\\u0080\"",
+      "output": "\"\\u0000\\u0001\\u001f\u007f\u0080\""
+    },
+    {
+      "input": "\"\\b\\f\\n\\r\\t\"",
+      "output": "\"\\b\\f\\n\\r\\t\""
+    },
+    {
+      "input": "\"\\u2028\\u2029\\ufeff\"",
+      "output": "\"\u2028\u2029\ufeff\""
+    },
+    {
+      "input": "\"\\ud83d\\ude02\"",
+      "output": "\"\ud83d\ude02\""
+    },
+    {
+      "input": "\"\\ud800 lone high\"",
+      "output": "\"\\ud800 lone high\""
+    },
+    {
+      "input": "\"lone low \\udc00\"",
+      "output": "\"lone low \\udc00\""
+    },
+    {
+      "input": "\"\\udc00\\ud800\"",
+      "output": "\"\\udc00\\ud800\""
+    },
+    {
+      "input": "\"\\u00e9 raw \u00e9\"",
+      "output": "\"\u00e9 raw \u00e9\""
+    },
+    {
+      "input": "0",
+      "output": "0"
+    },
+    {
+      "input": "-0",
+      "output": "0"
+    },
+    {
+      "input": "1",
+      "output": "1"
+    },
+    {
+      "input": "-1",
+      "output": "-1"
+    },
+    {
+      "input": "1.0",
+      "output": "1"
+    },
+    {
+      "input": "1.5",
+      "output": "1.5"
+    },
+    {
+      "input": "0.1",
+      "output": "0.1"
+    },
+    {
+      "input": "1e21",
+      "output": "1e+21"
+    },
+    {
+      "input": "1e20",
+      "output": "100000000000000000000"
+    },
+    {
+      "input": "123456789012345678901",
+      "output": "123456789012345680000"
+    },
+    {
+      "input": "1.7e9",
+      "output": "1700000000"
+    },
+    {
+      "input": "1e-7",
+      "output": "1e-7"
+    },
+    {
+      "input": "0.000001",
+      "output": "0.000001"
+    },
+    {
+      "input": "1.5e-7",
+      "output": "1.5e-7"
+    },
+    {
+      "input": "9007199254740993",
+      "output": "9007199254740992"
+    },
+    {
+      "input": "5e-324",
+      "output": "5e-324"
+    },
+    {
+      "input": "1.7976931348623157e308",
+      "output": "1.7976931348623157e+308"
+    },
+    {
+      "input": "0.1234567890123456789",
+      "output": "0.12345678901234568"
+    },
+    {
+      "input": "100",
+      "output": "100"
+    },
+    {
+      "input": "12345.678e3",
+      "output": "12345678"
+    },
+    {
+      "input": "{\"b\":1,\"a\":2}",
+      "output": "{\"b\":1,\"a\":2}"
+    },
+    {
+      "input": "{\"a\":1,\"a\":2,\"b\":3}",
+      "output": "{\"a\":2,\"b\":3}"
+    },
+    {
+      "input": "[1,[2,[3]],{}]",
+      "output": "[1,[2,[3]],{}]"
+    },
+    {
+      "input": "true",
+      "output": "true"
+    },
+    {
+      "input": "null",
+      "output": "null"
+    },
+    {
+      "input": " { \"sp\" : [ 1 , 2 ] } ",
+      "output": "{\"sp\":[1,2]}"
+    }
+  ]
+}

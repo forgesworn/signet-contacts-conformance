@@ -1,0 +1,20 @@
+{
+  "name": "@forgesworn/signet-contacts-conformance",
+  "version": "0.1.0",
+  "description": "Language-neutral conformance vectors for the signet-contacts v2 wire.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "author": "forgesworn",
+  "scripts": {
+    "generate": "node scripts/generate.mjs",
+    "check": "node scripts/generate.mjs --check"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/forgesworn/signet-contacts-conformance.git"
+  }
+}

@@ -1,0 +1,662 @@
+{
+  "description": "applyProjection over a sequence, starting from emptyContactsState(). `accepted` is false when the state is returned unchanged.",
+  "steps": [
+    {
+      "name": "first projection",
+      "projection": {
+        "v": 2,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "scopes": [
+          "signet.contacts.read:directory",
+          "signet.contacts.blocks.read"
+        ],
+        "frontier": {
+          "maxClock": 5,
+          "opCount": 1,
+          "publishedAt": 1700000000,
+          "deviceId": "22222222222222222222222222222222"
+        },
+        "issuedAt": 1700000000,
+        "expiresAt": 1700003600,
+        "contacts": [
+          {
+            "contactId": "8a4080ee6b4921935d12e59c0f6dfaf2",
+            "blocked": false,
+            "identities": [
+              {
+                "pubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              }
+            ]
+          },
+          {
+            "contactId": "7e908ac49dd10aef772612301d51ee9f",
+            "blocked": true,
+            "identities": [
+              {
+                "pubkey": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              }
+            ]
+          }
+        ]
+      },
+      "nowSec": 1700000000,
+      "accepted": true,
+      "state": {
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "projection": {
+          "v": 2,
+          "grantId": "ffffffffffffffffffffffffffffffff",
+          "scopes": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "frontier": {
+            "maxClock": 5,
+            "opCount": 1,
+            "publishedAt": 1700000000,
+            "deviceId": "22222222222222222222222222222222"
+          },
+          "issuedAt": 1700000000,
+          "expiresAt": 1700003600,
+          "contacts": [
+            {
+              "contactId": "8a4080ee6b4921935d12e59c0f6dfaf2",
+              "blocked": false,
+              "identities": [
+                {
+                  "pubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              ]
+            },
+            {
+              "contactId": "7e908ac49dd10aef772612301d51ee9f",
+              "blocked": true,
+              "identities": [
+                {
+                  "pubkey": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              ]
+            }
+          ]
+        },
+        "receivedAt": 1700000000,
+        "blockedPubkeys": [
+          "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        ],
+        "revoked": false
+      },
+      "fresh": true,
+      "visible": [
+        "8a4080ee6b4921935d12e59c0f6dfaf2"
+      ]
+    },
+    {
+      "name": "older replay ignored",
+      "projection": {
+        "v": 2,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "scopes": [
+          "signet.contacts.read:directory",
+          "signet.contacts.blocks.read"
+        ],
+        "frontier": {
+          "maxClock": 9,
+          "opCount": 1,
+          "publishedAt": 1699999990,
+          "deviceId": "22222222222222222222222222222222"
+        },
+        "issuedAt": 1699999990,
+        "expiresAt": 1700003590,
+        "contacts": [
+          {
+            "contactId": "8a4080ee6b4921935d12e59c0f6dfaf2",
+            "blocked": false,
+            "identities": [
+              {
+                "pubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              }
+            ]
+          }
+        ]
+      },
+      "nowSec": 1700000001,
+      "accepted": false,
+      "state": {
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "projection": {
+          "v": 2,
+          "grantId": "ffffffffffffffffffffffffffffffff",
+          "scopes": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "frontier": {
+            "maxClock": 5,
+            "opCount": 1,
+            "publishedAt": 1700000000,
+            "deviceId": "22222222222222222222222222222222"
+          },
+          "issuedAt": 1700000000,
+          "expiresAt": 1700003600,
+          "contacts": [
+            {
+              "contactId": "8a4080ee6b4921935d12e59c0f6dfaf2",
+              "blocked": false,
+              "identities": [
+                {
+                  "pubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              ]
+            },
+            {
+              "contactId": "7e908ac49dd10aef772612301d51ee9f",
+              "blocked": true,
+              "identities": [
+                {
+                  "pubkey": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              ]
+            }
+          ]
+        },
+        "receivedAt": 1700000000,
+        "blockedPubkeys": [
+          "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        ],
+        "revoked": false
+      },
+      "fresh": true,
+      "visible": [
+        "8a4080ee6b4921935d12e59c0f6dfaf2"
+      ]
+    },
+    {
+      "name": "exact tie ignored",
+      "projection": {
+        "v": 2,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "scopes": [
+          "signet.contacts.read:directory",
+          "signet.contacts.blocks.read"
+        ],
+        "frontier": {
+          "maxClock": 5,
+          "opCount": 1,
+          "publishedAt": 1700000000,
+          "deviceId": "22222222222222222222222222222222"
+        },
+        "issuedAt": 1700000000,
+        "expiresAt": 1700003600,
+        "contacts": []
+      },
+      "nowSec": 1700000002,
+      "accepted": false,
+      "state": {
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "projection": {
+          "v": 2,
+          "grantId": "ffffffffffffffffffffffffffffffff",
+          "scopes": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "frontier": {
+            "maxClock": 5,
+            "opCount": 1,
+            "publishedAt": 1700000000,
+            "deviceId": "22222222222222222222222222222222"
+          },
+          "issuedAt": 1700000000,
+          "expiresAt": 1700003600,
+          "contacts": [
+            {
+              "contactId": "8a4080ee6b4921935d12e59c0f6dfaf2",
+              "blocked": false,
+              "identities": [
+                {
+                  "pubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              ]
+            },
+            {
+              "contactId": "7e908ac49dd10aef772612301d51ee9f",
+              "blocked": true,
+              "identities": [
+                {
+                  "pubkey": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              ]
+            }
+          ]
+        },
+        "receivedAt": 1700000000,
+        "blockedPubkeys": [
+          "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        ],
+        "revoked": false
+      },
+      "fresh": true,
+      "visible": [
+        "8a4080ee6b4921935d12e59c0f6dfaf2"
+      ]
+    },
+    {
+      "name": "same second, higher clock wins",
+      "projection": {
+        "v": 2,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "scopes": [
+          "signet.contacts.read:directory",
+          "signet.contacts.blocks.read"
+        ],
+        "frontier": {
+          "maxClock": 6,
+          "opCount": 1,
+          "publishedAt": 1700000000,
+          "deviceId": "22222222222222222222222222222222"
+        },
+        "issuedAt": 1700000000,
+        "expiresAt": 1700003600,
+        "contacts": [
+          {
+            "contactId": "8a4080ee6b4921935d12e59c0f6dfaf2",
+            "blocked": false,
+            "identities": [
+              {
+                "pubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              }
+            ]
+          },
+          {
+            "contactId": "0ebc45d3081626c66e365e06cbc7b0fc",
+            "blocked": true,
+            "identities": [
+              {
+                "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+              }
+            ]
+          }
+        ]
+      },
+      "nowSec": 1700000003,
+      "accepted": true,
+      "state": {
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "projection": {
+          "v": 2,
+          "grantId": "ffffffffffffffffffffffffffffffff",
+          "scopes": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "frontier": {
+            "maxClock": 6,
+            "opCount": 1,
+            "publishedAt": 1700000000,
+            "deviceId": "22222222222222222222222222222222"
+          },
+          "issuedAt": 1700000000,
+          "expiresAt": 1700003600,
+          "contacts": [
+            {
+              "contactId": "8a4080ee6b4921935d12e59c0f6dfaf2",
+              "blocked": false,
+              "identities": [
+                {
+                  "pubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              ]
+            },
+            {
+              "contactId": "0ebc45d3081626c66e365e06cbc7b0fc",
+              "blocked": true,
+              "identities": [
+                {
+                  "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+                }
+              ]
+            }
+          ]
+        },
+        "receivedAt": 1700000003,
+        "blockedPubkeys": [
+          "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+        ],
+        "revoked": false
+      },
+      "fresh": true,
+      "visible": [
+        "8a4080ee6b4921935d12e59c0f6dfaf2"
+      ]
+    },
+    {
+      "name": "newer second, lower clock still wins (R-30)",
+      "projection": {
+        "v": 2,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "scopes": [
+          "signet.contacts.read:directory",
+          "signet.contacts.blocks.read"
+        ],
+        "frontier": {
+          "maxClock": 1,
+          "opCount": 1,
+          "publishedAt": 1700000005,
+          "deviceId": "22222222222222222222222222222222"
+        },
+        "issuedAt": 1700000005,
+        "expiresAt": 1700003605,
+        "contacts": [
+          {
+            "contactId": "0ebc45d3081626c66e365e06cbc7b0fc",
+            "blocked": true,
+            "identities": [
+              {
+                "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+              }
+            ]
+          },
+          {
+            "contactId": "eaa90372139060857fc8b607992154a0",
+            "blocked": true,
+            "identities": [
+              {
+                "pubkey": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+              }
+            ]
+          }
+        ]
+      },
+      "nowSec": 1700000004,
+      "accepted": true,
+      "state": {
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "projection": {
+          "v": 2,
+          "grantId": "ffffffffffffffffffffffffffffffff",
+          "scopes": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "frontier": {
+            "maxClock": 1,
+            "opCount": 1,
+            "publishedAt": 1700000005,
+            "deviceId": "22222222222222222222222222222222"
+          },
+          "issuedAt": 1700000005,
+          "expiresAt": 1700003605,
+          "contacts": [
+            {
+              "contactId": "0ebc45d3081626c66e365e06cbc7b0fc",
+              "blocked": true,
+              "identities": [
+                {
+                  "pubkey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+                }
+              ]
+            },
+            {
+              "contactId": "eaa90372139060857fc8b607992154a0",
+              "blocked": true,
+              "identities": [
+                {
+                  "pubkey": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+                }
+              ]
+            }
+          ]
+        },
+        "receivedAt": 1700000004,
+        "blockedPubkeys": [
+          "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        ],
+        "revoked": false
+      },
+      "fresh": true,
+      "visible": []
+    },
+    {
+      "name": "out-of-order revocation applies, floor kept, blocks sticky",
+      "projection": {
+        "v": 2,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "scopes": [
+          "signet.contacts.read:directory",
+          "signet.contacts.blocks.read"
+        ],
+        "frontier": {
+          "maxClock": 1,
+          "opCount": 1,
+          "publishedAt": 1699999900,
+          "deviceId": "22222222222222222222222222222222"
+        },
+        "issuedAt": 1699999900,
+        "expiresAt": 1700003500,
+        "contacts": [],
+        "revoked": true
+      },
+      "nowSec": 1700000005,
+      "accepted": true,
+      "state": {
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "projection": {
+          "v": 2,
+          "grantId": "ffffffffffffffffffffffffffffffff",
+          "scopes": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "frontier": {
+            "maxClock": 1,
+            "opCount": 1,
+            "publishedAt": 1700000005,
+            "deviceId": "22222222222222222222222222222222"
+          },
+          "issuedAt": 1699999900,
+          "expiresAt": 1700003500,
+          "contacts": [],
+          "revoked": true
+        },
+        "receivedAt": 1700000005,
+        "blockedPubkeys": [
+          "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        ],
+        "revoked": true
+      },
+      "fresh": false,
+      "visible": []
+    },
+    {
+      "name": "stale snapshot cannot un-revoke",
+      "projection": {
+        "v": 2,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "scopes": [
+          "signet.contacts.read:directory",
+          "signet.contacts.blocks.read"
+        ],
+        "frontier": {
+          "maxClock": 1,
+          "opCount": 1,
+          "publishedAt": 1700000005,
+          "deviceId": "22222222222222222222222222222222"
+        },
+        "issuedAt": 1700000005,
+        "expiresAt": 1700003605,
+        "contacts": [
+          {
+            "contactId": "8a4080ee6b4921935d12e59c0f6dfaf2",
+            "blocked": false,
+            "identities": [
+              {
+                "pubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              }
+            ]
+          }
+        ]
+      },
+      "nowSec": 1700000006,
+      "accepted": false,
+      "state": {
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "projection": {
+          "v": 2,
+          "grantId": "ffffffffffffffffffffffffffffffff",
+          "scopes": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "frontier": {
+            "maxClock": 1,
+            "opCount": 1,
+            "publishedAt": 1700000005,
+            "deviceId": "22222222222222222222222222222222"
+          },
+          "issuedAt": 1699999900,
+          "expiresAt": 1700003500,
+          "contacts": [],
+          "revoked": true
+        },
+        "receivedAt": 1700000005,
+        "blockedPubkeys": [
+          "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        ],
+        "revoked": true
+      },
+      "fresh": false,
+      "visible": []
+    },
+    {
+      "name": "newer snapshot un-revokes",
+      "projection": {
+        "v": 2,
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "scopes": [
+          "signet.contacts.read:directory",
+          "signet.contacts.blocks.read"
+        ],
+        "frontier": {
+          "maxClock": 1,
+          "opCount": 1,
+          "publishedAt": 1700000006,
+          "deviceId": "22222222222222222222222222222222"
+        },
+        "issuedAt": 1700000006,
+        "expiresAt": 1700003606,
+        "contacts": [
+          {
+            "contactId": "8a4080ee6b4921935d12e59c0f6dfaf2",
+            "blocked": false,
+            "identities": [
+              {
+                "pubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              }
+            ]
+          }
+        ]
+      },
+      "nowSec": 1700000007,
+      "accepted": true,
+      "state": {
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "projection": {
+          "v": 2,
+          "grantId": "ffffffffffffffffffffffffffffffff",
+          "scopes": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "frontier": {
+            "maxClock": 1,
+            "opCount": 1,
+            "publishedAt": 1700000006,
+            "deviceId": "22222222222222222222222222222222"
+          },
+          "issuedAt": 1700000006,
+          "expiresAt": 1700003606,
+          "contacts": [
+            {
+              "contactId": "8a4080ee6b4921935d12e59c0f6dfaf2",
+              "blocked": false,
+              "identities": [
+                {
+                  "pubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              ]
+            }
+          ]
+        },
+        "receivedAt": 1700000007,
+        "blockedPubkeys": [],
+        "revoked": false
+      },
+      "fresh": true,
+      "visible": [
+        "8a4080ee6b4921935d12e59c0f6dfaf2"
+      ]
+    },
+    {
+      "name": "another grant is ignored",
+      "projection": {
+        "v": 2,
+        "grantId": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "scopes": [
+          "signet.contacts.read:directory",
+          "signet.contacts.blocks.read"
+        ],
+        "frontier": {
+          "maxClock": 1,
+          "opCount": 1,
+          "publishedAt": 1700000009,
+          "deviceId": "22222222222222222222222222222222"
+        },
+        "issuedAt": 1700000009,
+        "expiresAt": 1700003609,
+        "contacts": []
+      },
+      "nowSec": 1700000008,
+      "accepted": false,
+      "state": {
+        "grantId": "ffffffffffffffffffffffffffffffff",
+        "projection": {
+          "v": 2,
+          "grantId": "ffffffffffffffffffffffffffffffff",
+          "scopes": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "frontier": {
+            "maxClock": 1,
+            "opCount": 1,
+            "publishedAt": 1700000006,
+            "deviceId": "22222222222222222222222222222222"
+          },
+          "issuedAt": 1700000006,
+          "expiresAt": 1700003606,
+          "contacts": [
+            {
+              "contactId": "8a4080ee6b4921935d12e59c0f6dfaf2",
+              "blocked": false,
+              "identities": [
+                {
+                  "pubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              ]
+            }
+          ]
+        },
+        "receivedAt": 1700000007,
+        "blockedPubkeys": [],
+        "revoked": false
+      },
+      "fresh": true,
+      "visible": [
+        "8a4080ee6b4921935d12e59c0f6dfaf2"
+      ]
+    }
+  ]
+}

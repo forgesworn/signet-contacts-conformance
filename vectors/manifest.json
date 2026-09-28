@@ -1,0 +1,35 @@
+{
+  "description": "Provenance for every vector file. vectors/*.json are copied verbatim from the reference; vectors/cases/*.json are generated from it by scripts/generate.mjs.",
+  "reference": {
+    "package": "@forgesworn/signet-contacts",
+    "version": "0.1.0",
+    "commit": "a44b28615c1633531cb201984b011ddc79448b88"
+  },
+  "generator": {
+    "node": "v24.21.0"
+  },
+  "files": {
+    "vectors/channel-check-v1.json": "1d315d6f8928c19a257ce8ed55755377dccaafd4b51a6a5d919b220fa31f838d",
+    "vectors/contact-invite-v1.json": "d22e11ce850e5304764cac5183eea3a057f6bc9b4b1c0c1f3d8176f98c50c69d",
+    "vectors/envelope.v2.json": "06bd0ceccabcc00e7e4f7e7e3aecfd8466bbd124667e4b1b72b333b4bcd91dc7",
+    "vectors/pairing-code.json": "b9ae009f5a931f9d7b1ae1e34cc960c7700e2dc64cef05aa45d46eb779cd3be6",
+    "vectors/pairing.v2.json": "6ca041213deb6ebef0766e656b92fd3a2cf91bfb6825ca7c6a6373c4553d4460",
+    "vectors/projection.v2.json": "07007dbd181877287a065268b0d08a6e6d0859c168569eecf4f4a3db58bc6f78",
+    "vectors/proposal.v1.json": "51121a5ca8dccbb1e085088cde85ee006b5d74797327de8ada79ed244ba206af",
+    "vectors/sanitise.json": "c18a913a7cd16820a990ac7eef200aa998071bf67f6e51a3138d628d404f0289",
+    "vectors/cases/ack.json": "0c221d7fe26b7ac668df767a525c856e60563171c7dae7af7f1696b981ce8439",
+    "vectors/cases/app-invite.json": "444a3bf24b5243e4813326326a10f9b59c1188b1d9408f2d686525d1251654b1",
+    "vectors/cases/contact-exchange.json": "3472b0ff55b78ea058416c03c935470a6a1b4c82cb2a11d2d6ec6f97078d361e",
+    "vectors/cases/envelope-parse.json": "dffe9b2cf50ee77e415f7269f6e10c6a7bd4aca187fff527342331b1ae1ca652",
+    "vectors/cases/invite.json": "3db736af758e3a071b7aae6cedcfe1b25d7ee36b725366e4c2a249b472258504",
+    "vectors/cases/nostr.json": "1b2ed472e6ee768e76de8c8d4585ddc9c2add413f6ab9328bb8fccee682f9f52",
+    "vectors/cases/pairing-uri.json": "5afa0859c247c5bd6981dec59b943f7fe0c27206c27e656b7c3861e5d72d118f",
+    "vectors/cases/projection-build.json": "9ff9843345b9f0e244c2856ff86f511c39cd6c8a38bdd287de228b120703c670",
+    "vectors/cases/projection-parse.json": "86f3f92b0b178630e6db16ddd5ba6c8664beee222157a51458aacb9f21aef531",
+    "vectors/cases/proposal-parse.json": "a6c37a73cad066c83b37aaba98bc0da812b92982f0f590285173b8cc53541716",
+    "vectors/cases/relay-url.json": "e17506214abd8abfa90624a7a0b36c27136ff07f846ec2647600fdcb6d422169",
+    "vectors/cases/state.json": "0cd7606ef842612350f302f27635209528f04bec12fb094fa92827435a849e57",
+    "vectors/cases/stringify.json": "2c884b7b4d60aa3466566dcf53e798e9a76821cba058e79a3909bc054a446752",
+    "vectors/cases/upstream-malformed.json": "cb077b6e675b4e5c6a03bb49eec58ae96e9796004c2e7bf2f135db4c71a2aedf"
+  }
+}

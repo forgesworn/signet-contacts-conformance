@@ -1,0 +1,794 @@
+{
+  "description": "parsePairingRequestV2(input, { nowSec }): the request (or null) and the warnings, in order.",
+  "nowSec": 1700000000,
+  "cases": [
+    {
+      "name": "baseline",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "bare query string, no scheme",
+      "input": "v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "v=1 is refused",
+      "input": "signet-grant://pair?v=1&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": null,
+        "warnings": [
+          "bad-version"
+        ]
+      }
+    },
+    {
+      "name": "missing v",
+      "input": "signet-grant://pair?app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": null,
+        "warnings": [
+          "bad-version"
+        ]
+      }
+    },
+    {
+      "name": "first v wins",
+      "input": "signet-grant://pair?v=2&v=1&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "uppercase app pubkey is lowercased",
+      "input": "signet-grant://pair?v=2&app=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "short app pubkey",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": null,
+        "warnings": [
+          "bad-app-pubkey"
+        ]
+      }
+    },
+    {
+      "name": "plaintext relay",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=ws%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": null,
+        "warnings": [
+          "bad-relay"
+        ]
+      }
+    },
+    {
+      "name": "loopback relay",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=ws%3A%2F%2Flocalhost%3A7777&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "ws://localhost:7777",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "stale t",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1699999699&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": null,
+        "warnings": [
+          "stale-timestamp"
+        ]
+      }
+    },
+    {
+      "name": "t at the edge",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000300&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000300,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "t with whitespace",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=+1700000000+&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "t in exponent form",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1.7e9&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "t in hex",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=0x6553f100&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "t fractional",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000.5&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": null,
+        "warnings": [
+          "bad-timestamp"
+        ]
+      }
+    },
+    {
+      "name": "t missing",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": null,
+        "warnings": [
+          "stale-timestamp"
+        ]
+      }
+    },
+    {
+      "name": "t empty",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": null,
+        "warnings": [
+          "stale-timestamp"
+        ]
+      }
+    },
+    {
+      "name": "t negative",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=-1&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": null,
+        "warnings": [
+          "bad-timestamp"
+        ]
+      }
+    },
+    {
+      "name": "lowercase challenge is kept verbatim",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=dddddddddddddddddddddddddddddddd",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "dddddddddddddddddddddddddddddddd"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "mixed-case challenge is kept verbatim",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=dDdDdDdDdDdDdDdDdDdDdDdDdDdDdDdD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "dDdDdDdDdDdDdDdDdDdDdDdDdDdDdDdD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "31-char challenge",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=ddddddddddddddddddddddddddddddd",
+      "expected": {
+        "request": null,
+        "warnings": [
+          "bad-challenge"
+        ]
+      }
+    },
+    {
+      "name": "non-hex challenge",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=gggggggggggggggggggggggggggggggg",
+      "expected": {
+        "request": null,
+        "warnings": [
+          "bad-challenge"
+        ]
+      }
+    },
+    {
+      "name": "unknown capability token is dropped",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.read%3Aavatar&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": [
+          "caps-unknown-token"
+        ]
+      }
+    },
+    {
+      "name": "only unknown tokens",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Aavatar&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": null,
+        "warnings": [
+          "caps-unknown-token",
+          "caps-empty"
+        ]
+      }
+    },
+    {
+      "name": "caps with spaces and empties",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=+signet.contacts.blocks.read+%2C+%2Csignet.contacts.read%3Adirectory+&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "caps out of order and duplicated",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.blocks.read%2Csignet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "all fifteen capabilities",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.read%3Amethod%3Aphone%2Csignet.contacts.read%3Amethod%3Aemail%2Csignet.contacts.read%3Amethod%3Awebsite%2Csignet.contacts.read%3Amethod%3Apostal-address%2Csignet.contacts.read%3Amethod%3Aother%2Csignet.contacts.read%3Atier%2Csignet.contacts.read%3Achecks%2Csignet.contacts.read%3Acheck-records%2Csignet.contacts.read%3Aroles%2Csignet.contacts.blocks.read%2Csignet.contacts.propose%3Aadd-ken%2Csignet.contacts.propose%3Arename-app-label%2Csignet.contacts.invites%3Acreate%2Csignet.contacts.invites%3Areceive&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.read:method:phone",
+            "signet.contacts.read:method:email",
+            "signet.contacts.read:method:website",
+            "signet.contacts.read:method:postal-address",
+            "signet.contacts.read:method:other",
+            "signet.contacts.read:tier",
+            "signet.contacts.read:checks",
+            "signet.contacts.read:check-records",
+            "signet.contacts.read:roles",
+            "signet.contacts.blocks.read",
+            "signet.contacts.propose:add-ken",
+            "signet.contacts.propose:rename-app-label",
+            "signet.contacts.invites:create",
+            "signet.contacts.invites:receive"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "seventeen tokens truncate",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.read%3Amethod%3Aphone%2Csignet.contacts.read%3Amethod%3Aemail%2Csignet.contacts.read%3Amethod%3Awebsite%2Csignet.contacts.read%3Amethod%3Apostal-address%2Csignet.contacts.read%3Amethod%3Aother%2Csignet.contacts.read%3Atier%2Csignet.contacts.read%3Achecks%2Csignet.contacts.read%3Acheck-records%2Csignet.contacts.read%3Aroles%2Csignet.contacts.blocks.read%2Csignet.contacts.propose%3Aadd-ken%2Csignet.contacts.propose%3Arename-app-label%2Csignet.contacts.invites%3Acreate%2Csignet.contacts.invites%3Areceive%2Csignet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.read:method:phone",
+            "signet.contacts.read:method:email",
+            "signet.contacts.read:method:website",
+            "signet.contacts.read:method:postal-address",
+            "signet.contacts.read:method:other",
+            "signet.contacts.read:tier",
+            "signet.contacts.read:checks",
+            "signet.contacts.read:check-records",
+            "signet.contacts.read:roles",
+            "signet.contacts.blocks.read",
+            "signet.contacts.propose:add-ken",
+            "signet.contacts.propose:rename-app-label",
+            "signet.contacts.invites:create",
+            "signet.contacts.invites:receive"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": [
+          "caps-truncated"
+        ]
+      }
+    },
+    {
+      "name": "missing dir defaults to owner with a warning",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": [
+          "bad-directory"
+        ]
+      }
+    },
+    {
+      "name": "dependant directory",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=dependant&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "dependant",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "bad dir",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=family&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": [
+          "bad-directory"
+        ]
+      }
+    },
+    {
+      "name": "name with bidi override",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Fl%E2%80%AEock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "name of 64 code points",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "name of 65 code points",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": [
+          "name-truncated"
+        ]
+      }
+    },
+    {
+      "name": "name of 64 astral code points",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "name of 65 astral code points",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82%F0%9F%98%82&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": [
+          "name-truncated"
+        ]
+      }
+    },
+    {
+      "name": "name only controls",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=%00%E2%80%8B+&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": null,
+        "warnings": [
+          "bad-app-name"
+        ]
+      }
+    },
+    {
+      "name": "name missing",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": null,
+        "warnings": [
+          "bad-app-name"
+        ]
+      }
+    },
+    {
+      "name": "plus decodes to space",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=My+App&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "My App",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "stray percent is literal",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=100%25+%ZZ&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "100% %ZZ",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "invalid UTF-8 decodes to U+FFFD",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=A%FFB&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "A\ufffdB",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "leading BOM in a value is kept",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=%EF%BB%BFFlock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "empty segments are skipped",
+      "input": "signet-grant://pair?&&v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD&&",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    },
+    {
+      "name": "too long",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD&pad=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "expected": {
+        "request": null,
+        "warnings": [
+          "too-long"
+        ]
+      }
+    },
+    {
+      "name": "exactly the cap",
+      "input": "signet-grant://pair?v=2&app=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&name=Flock&caps=signet.contacts.read%3Adirectory%2Csignet.contacts.blocks.read&dir=owner&relay=wss%3A%2F%2Frelay.example.com&t=1700000000&challenge=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD&pad=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "expected": {
+        "request": {
+          "v": 2,
+          "appPubkey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "appName": "Flock",
+          "capabilities": [
+            "signet.contacts.read:directory",
+            "signet.contacts.blocks.read"
+          ],
+          "directory": "owner",
+          "rendezvousRelay": "wss://relay.example.com",
+          "t": 1700000000,
+          "challenge": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        },
+        "warnings": []
+      }
+    }
+  ]
+}

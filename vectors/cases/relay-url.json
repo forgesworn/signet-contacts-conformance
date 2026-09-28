@@ -1,0 +1,77 @@
+{
+  "description": "isValidContactsRelayUrl: wss:// only, ws:// only to loopback, at most MAX_RELAY_LEN (256) UTF-16 units.",
+  "cases": [
+    {
+      "input": "wss://relay.example.com",
+      "valid": true
+    },
+    {
+      "input": "WSS://Relay.Example.com",
+      "valid": true
+    },
+    {
+      "input": "wss://",
+      "valid": true
+    },
+    {
+      "input": "wss:relay",
+      "valid": false
+    },
+    {
+      "input": "ws://localhost",
+      "valid": true
+    },
+    {
+      "input": "ws://localhost:7777",
+      "valid": true
+    },
+    {
+      "input": "ws://LOCALHOST/",
+      "valid": true
+    },
+    {
+      "input": "ws://127.0.0.1",
+      "valid": true
+    },
+    {
+      "input": "ws://127.0.0.1:1/x",
+      "valid": true
+    },
+    {
+      "input": "ws://localhost.evil.com",
+      "valid": false
+    },
+    {
+      "input": "ws://127.0.0.1.evil",
+      "valid": false
+    },
+    {
+      "input": "ws://localhostx",
+      "valid": false
+    },
+    {
+      "input": "ws://example.com",
+      "valid": false
+    },
+    {
+      "input": "https://relay.example.com",
+      "valid": false
+    },
+    {
+      "input": "",
+      "valid": false
+    },
+    {
+      "input": " wss://relay.example.com",
+      "valid": false
+    },
+    {
+      "input": "wss://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "valid": true
+    },
+    {
+      "input": "wss://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "valid": false
+    }
+  ]
+}

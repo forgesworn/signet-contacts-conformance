@@ -3,7 +3,7 @@
   "reference": {
     "package": "@forgesworn/signet-contacts",
     "version": "0.1.0",
-    "commit": "a44b28615c1633531cb201984b011ddc79448b88"
+    "commit": "8ee761748f8eab8067065dd0a01b314318a29450"
   },
   "generator": {
     "node": "v24.21.0"
@@ -27,7 +27,7 @@
     "vectors/cases/projection-build.json": "9ff9843345b9f0e244c2856ff86f511c39cd6c8a38bdd287de228b120703c670",
     "vectors/cases/projection-parse.json": "86f3f92b0b178630e6db16ddd5ba6c8664beee222157a51458aacb9f21aef531",
     "vectors/cases/proposal-parse.json": "a6c37a73cad066c83b37aaba98bc0da812b92982f0f590285173b8cc53541716",
-    "vectors/cases/relay-url.json": "e17506214abd8abfa90624a7a0b36c27136ff07f846ec2647600fdcb6d422169",
+    "vectors/cases/relay-url.json": "b36b0adb7b1dc0b808fee450f3907fd09e6b0815b197faa2969300db7bcf7c42",
     "vectors/cases/state.json": "0cd7606ef842612350f302f27635209528f04bec12fb094fa92827435a849e57",
     "vectors/cases/stringify.json": "2c884b7b4d60aa3466566dcf53e798e9a76821cba058e79a3909bc054a446752",
     "vectors/cases/upstream-malformed.json": "cb077b6e675b4e5c6a03bb49eec58ae96e9796004c2e7bf2f135db4c71a2aedf"

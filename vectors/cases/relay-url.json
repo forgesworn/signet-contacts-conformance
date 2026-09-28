@@ -72,6 +72,18 @@
     {
       "input": "wss://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "valid": false
+    },
+    {
+      "input": "ws://localhost\n",
+      "valid": false
+    },
+    {
+      "input": "ws://127.0.0.1\n",
+      "valid": false
+    },
+    {
+      "input": "wss://relay.example.com\n",
+      "valid": true
     }
   ]
 }

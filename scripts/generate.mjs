@@ -69,6 +69,7 @@ const HEX = (c, n) => c.repeat(n);
     'ws://localhost:7777', 'ws://LOCALHOST/', 'ws://127.0.0.1', 'ws://127.0.0.1:1/x', 'ws://localhost.evil.com',
     'ws://127.0.0.1.evil', 'ws://localhostx', 'ws://example.com', 'https://relay.example.com', '',
     ' wss://relay.example.com', `wss://${'a'.repeat(250)}`, `wss://${'a'.repeat(251)}`,
+    'ws://localhost\n', 'ws://127.0.0.1\n', 'wss://relay.example.com\n',
   ];
   emit('vectors/cases/relay-url.json', {
     description: 'isValidContactsRelayUrl: wss:// only, ws:// only to loopback, at most MAX_RELAY_LEN (256) UTF-16 units.',

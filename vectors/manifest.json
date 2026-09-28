@@ -3,7 +3,7 @@
   "reference": {
     "package": "@forgesworn/signet-contacts",
     "version": "0.1.0",
-    "commit": "8ee761748f8eab8067065dd0a01b314318a29450"
+    "commit": "fbb13cdeefb3e07421228ab3245b7e17e403ecab"
   },
   "generator": {
     "node": "v24.21.0"
@@ -21,7 +21,7 @@
     "vectors/cases/app-invite.json": "444a3bf24b5243e4813326326a10f9b59c1188b1d9408f2d686525d1251654b1",
     "vectors/cases/contact-exchange.json": "3472b0ff55b78ea058416c03c935470a6a1b4c82cb2a11d2d6ec6f97078d361e",
     "vectors/cases/envelope-parse.json": "dffe9b2cf50ee77e415f7269f6e10c6a7bd4aca187fff527342331b1ae1ca652",
-    "vectors/cases/invite.json": "3db736af758e3a071b7aae6cedcfe1b25d7ee36b725366e4c2a249b472258504",
+    "vectors/cases/invite.json": "dafb36b99e792504f7e847e88fd1538092f1e56e9981ec4777204ac6126246e1",
     "vectors/cases/nostr.json": "1b2ed472e6ee768e76de8c8d4585ddc9c2add413f6ab9328bb8fccee682f9f52",
     "vectors/cases/pairing-uri.json": "5afa0859c247c5bd6981dec59b943f7fe0c27206c27e656b7c3861e5d72d118f",
     "vectors/cases/projection-build.json": "9ff9843345b9f0e244c2856ff86f511c39cd6c8a38bdd287de228b120703c670",

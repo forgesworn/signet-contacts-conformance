@@ -9,8 +9,8 @@ decisions still open.
 | Repository | State |
 | --- | --- |
 | `forgesworn/signet-contacts` | TypeScript reference, 0.1.0, not on npm, no tags. Runs `conformance.yml` since pull request #5. |
-| `forgesworn/signet-contacts-conformance` | Vectors generated from reference `8ee7617` on Node 24.21.0. No tags; ports test against `main`. |
-| `forgesworn/signet-contacts-kotlin` | Port at 0.1.0: core 298 tests, nostr 8, all vectors passing. Not published; consumed as a composite build pinned to a commit. |
+| `forgesworn/signet-contacts-conformance` | Vectors generated from reference `fbb13cd` on Node 24.21.0. No tags; ports test against `main`. |
+| `forgesworn/signet-contacts-kotlin` | Port at 0.1.0: core 316 tests, nostr 8, all vectors passing. Not published; CI pinned to a conformance commit, bumped by hand after each vector change, with a scheduled drift job against its `main`. |
 
 CI is green on `main` in all three.
 
@@ -68,12 +68,26 @@ as a port divergence.
   requires at most 2^53 - 1.
 - **The signet-contacts README says the repository is private.** It is public.
   The install section still describes a private-repository install.
+- **Wall-clock elapsed time.** `Date.now()` is used for pairing deadlines and
+  live-gap checks, so a clock change distorts them; a monotonic source would
+  be safer.
+- **Signature verification is implicit.** The reference relies on
+  nostr-tools' `SimplePool` default verification and the `RelayIo` contract
+  text; no test enforces that an adapter verifies, and a custom adapter that
+  skips it is silently unsafe (see PORTING.md, "Relay adapters and client
+  lifecycle").
 
 ## Kotlin port divergences to revisit
 
-- Non-ASCII relay hosts use `java.net.IDN` (IDNA 2003), not UTS #46. On
-  Android, `android.icu.text.IDNA` (API 24 and up) implements UTS #46 and
-  could replace it there.
+- Non-ASCII relay hosts go through `java.net.IDN` (IDNA 2003), which agrees
+  with UTS #46 for ordinary hosts. The four deviation characters (U+00DF,
+  U+03C2, U+200C, U+200D) and code points unassigned in Unicode 3.2 are
+  rejected (fail closed) where the reference accepts them. `xn--` labels are
+  validated with an RFC 3492 decoder on both paths. `invite.json` carries
+  these as known divergences: `relay "wss://faß.de/"`,
+  `relay "wss://ς.example/"`, `relay "wss://ẞ.example/"` and
+  `relay "wss://%C3%9F.example/"`. On Android, `android.icu.text.IDNA` (API
+  24 and up) implements UTS #46 and could replace `java.net.IDN` there.
 
 ## Token upkeep
 

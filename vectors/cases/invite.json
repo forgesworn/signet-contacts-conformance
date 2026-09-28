@@ -1,5 +1,5 @@
 {
-  "description": "parseContactInvite(raw, now): the invite (relays normalised as WHATWG URL href, deduplicated) or null. Relay normalisation is hashed into every exchange transcript, so it must match exactly. Generated on the Node version named in manifest.json.",
+  "description": "parseContactInvite(raw, now): the invite (relays normalised as WHATWG URL href, deduplicated) or null. Relay normalisation is hashed into every exchange transcript, so it must match exactly, including IDNA host handling (UTS #46 mapping, deviation characters, and Punycode label validation). Generated on the Node version named in manifest.json.",
   "now": 1700000000,
   "cases": [
     {
@@ -456,6 +456,141 @@
           "wss://a..b./c"
         ]
       }
+    },
+    {
+      "name": "relay \"wss://fa\u00df.de/\"",
+      "raw": "{\"v\":1,\"recipient\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"wss://fa\u00df.de/\"]}",
+      "expected": {
+        "v": 1,
+        "recipient": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "relays": [
+          "wss://xn--fa-hia.de/"
+        ]
+      }
+    },
+    {
+      "name": "relay \"wss://\u03c2.example/\"",
+      "raw": "{\"v\":1,\"recipient\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"wss://\u03c2.example/\"]}",
+      "expected": {
+        "v": 1,
+        "recipient": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "relays": [
+          "wss://xn--3xa.example/"
+        ]
+      }
+    },
+    {
+      "name": "relay \"wss://a\u200db.example/\"",
+      "raw": "{\"v\":1,\"recipient\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"wss://a\u200db.example/\"]}",
+      "expected": null
+    },
+    {
+      "name": "relay \"wss://a\u200cb.example/\"",
+      "raw": "{\"v\":1,\"recipient\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"wss://a\u200cb.example/\"]}",
+      "expected": null
+    },
+    {
+      "name": "relay \"wss://\u1e9e.example/\"",
+      "raw": "{\"v\":1,\"recipient\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"wss://\u1e9e.example/\"]}",
+      "expected": {
+        "v": 1,
+        "recipient": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "relays": [
+          "wss://xn--zca.example/"
+        ]
+      }
+    },
+    {
+      "name": "relay \"wss://%C3%9F.example/\"",
+      "raw": "{\"v\":1,\"recipient\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"wss://%C3%9F.example/\"]}",
+      "expected": {
+        "v": 1,
+        "recipient": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "relays": [
+          "wss://xn--zca.example/"
+        ]
+      }
+    },
+    {
+      "name": "relay \"wss://B\u00fccher.example/\"",
+      "raw": "{\"v\":1,\"recipient\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"wss://B\u00fccher.example/\"]}",
+      "expected": {
+        "v": 1,
+        "recipient": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "relays": [
+          "wss://xn--bcher-kva.example/"
+        ]
+      }
+    },
+    {
+      "name": "relay \"wss://xn--bcher-kva.example/\"",
+      "raw": "{\"v\":1,\"recipient\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"wss://xn--bcher-kva.example/\"]}",
+      "expected": {
+        "v": 1,
+        "recipient": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "relays": [
+          "wss://xn--bcher-kva.example/"
+        ]
+      }
+    },
+    {
+      "name": "relay \"wss://xn--999999999.example/\"",
+      "raw": "{\"v\":1,\"recipient\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"wss://xn--999999999.example/\"]}",
+      "expected": {
+        "v": 1,
+        "recipient": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "relays": [
+          "wss://xn--999999999.example/"
+        ]
+      }
+    },
+    {
+      "name": "relay \"wss://xn---abc.example/\"",
+      "raw": "{\"v\":1,\"recipient\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"wss://xn---abc.example/\"]}",
+      "expected": {
+        "v": 1,
+        "recipient": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "relays": [
+          "wss://xn---abc.example/"
+        ]
+      }
+    },
+    {
+      "name": "relay \"wss://xn--abc-.example/\"",
+      "raw": "{\"v\":1,\"recipient\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"wss://xn--abc-.example/\"]}",
+      "expected": {
+        "v": 1,
+        "recipient": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "relays": [
+          "wss://xn--abc-.example/"
+        ]
+      }
+    },
+    {
+      "name": "relay \"wss://xn--.example/\"",
+      "raw": "{\"v\":1,\"recipient\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"wss://xn--.example/\"]}",
+      "expected": {
+        "v": 1,
+        "recipient": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "relays": [
+          "wss://xn--.example/"
+        ]
+      }
+    },
+    {
+      "name": "relay \"wss://xn--999999999.b\u00fccher.example/\"",
+      "raw": "{\"v\":1,\"recipient\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"secret\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"relays\":[\"wss://xn--999999999.b\u00fccher.example/\"]}",
+      "expected": null
     },
     {
       "name": "duplicate relays after normalisation collapse",

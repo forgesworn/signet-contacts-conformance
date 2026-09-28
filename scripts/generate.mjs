@@ -311,6 +311,10 @@ const HEX = (c, n) => c.repeat(n);
     'wss://ex%41mple.com', 'wss://a%00b', 'wss://a b', 'wss://a<b', 'wss://xn--nxasmq6b.com', 'wss://\u00e9xample.com/\u00e9',
     '  wss://relay.example.com/\t\n', 'wss://relay.example.com/\u{1F602}', 'https://relay.example.com', 'ws://relay.example.com', 'wss://',
     'relay.example.com', `wss://${'a'.repeat(506)}`, `wss://${'a'.repeat(507)}`, 'wss://a..b./c',
+    'wss://faß.de/', 'wss://ς.example/', 'wss://a‍b.example/', 'wss://a‌b.example/',
+    'wss://ẞ.example/', 'wss://%C3%9F.example/', 'wss://Bücher.example/', 'wss://xn--bcher-kva.example/',
+    'wss://xn--999999999.example/', 'wss://xn---abc.example/', 'wss://xn--abc-.example/', 'wss://xn--.example/',
+    'wss://xn--999999999.bücher.example/',
   ];
   const cases = [
     ...relayInputs.map((r) => [`relay ${JSON.stringify(r)}`, inv([r])]),
@@ -332,7 +336,7 @@ const HEX = (c, n) => c.repeat(n);
     ['over 8192 bytes', inv(['wss://r.example'], { pad: '\u00e9'.repeat(4100) })],
   ];
   emit('vectors/cases/invite.json', {
-    description: 'parseContactInvite(raw, now): the invite (relays normalised as WHATWG URL href, deduplicated) or null. Relay normalisation is hashed into every exchange transcript, so it must match exactly. Generated on the Node version named in manifest.json.',
+    description: 'parseContactInvite(raw, now): the invite (relays normalised as WHATWG URL href, deduplicated) or null. Relay normalisation is hashed into every exchange transcript, so it must match exactly, including IDNA host handling (UTS #46 mapping, deviation characters, and Punycode label validation). Generated on the Node version named in manifest.json.',
     now: NOW,
     cases: cases.map(([name, raw]) => ({ name, raw, expected: ref.parseContactInvite(raw, NOW) })),
   });

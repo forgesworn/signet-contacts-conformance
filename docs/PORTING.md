@@ -73,8 +73,56 @@ vectors follow the current standard (Node 24). Relays with `^` in their path
 are unlikely in practice, but a producer and consumer on different runtimes
 would disagree about them.
 
+### IDNA
+
+WHATWG's domain-to-ASCII is UTS #46 with `Transitional_Processing=false`,
+`CheckHyphens=false`, `CheckBidi=true`, `CheckJoiners=true`,
+`UseSTD3ASCIIRules=false`, `VerifyDnsLength=false`. An `xn--` label must
+decode as valid RFC 3492 Punycode and re-validate; a label that fails, or
+that decodes to all-ASCII, fails the whole URL.
+
+IDNA 2003 implementations (`java.net.IDN`, Python's `encodings.idna`) agree
+with this for ordinary hosts, but differ on the four deviation characters
+(U+00DF, U+03C2, U+200C, U+200D) and on code points unassigned in Unicode 3.2
+(for example U+1E9E). A port without UTS #46 must fail closed on those
+inputs rather than produce a different hash; the reference accepts some of
+them, so such a port must carry an explicit divergence list in its
+conformance test. In `invite.json`, the cases `relay "wss://faß.de/"`,
+`relay "wss://ς.example/"`, `relay "wss://ẞ.example/"` and
+`relay "wss://%C3%9F.example/"` exercise this.
+
+Java's `IDN.toUnicode` never throws, so it cannot be used to validate
+`xn--` labels; a real Punycode decoder is needed.
+
 ## Nostr
 
 NIP-44 here is v2 with plaintext capped at 65535 bytes. Recent nostr-tools
 releases accept larger plaintexts; nothing on this wire seals more than
 `MAX_WIRE_BYTES` (65532) through NIP-44 directly, so the cap never binds.
+
+## Relay adapters and client lifecycle
+
+These are requirements the vectors cannot capture, because they are about
+the runtime shape of a relay adapter and the client's lifecycle rather than
+about the bytes of a single message.
+
+A relay adapter must verify every event's signature before the event can
+influence newest-selection or pagination. Without this a hostile relay
+forges an event with a far-future `created_at` that wins fetch-newest and
+hides an honest relay's newer projection, including a block or revocation;
+the client's decrypt then fails and reads as "nothing found". The reference
+gets this from nostr-tools' verifying pool; the `RelayIo` contract requires
+it of every adapter.
+
+Revocation and state listeners must be invoked after the ingest lock is
+released, never while it is held, and on no particular thread; a listener
+that re-enters the client must not deadlock.
+
+Stopping the client must not leave a half-committed state: once an ingest
+commits in memory it must also finish its storage writes and fire its
+listeners, or commit nothing. In Kotlin this is a final cancellation check
+followed by a non-cancellable commit block.
+
+Pairing deadlines are elapsed time; use a monotonic clock where the platform
+has one. The reference uses `Date.now()`, listed under findings in
+`NEXT-STEPS.md`.

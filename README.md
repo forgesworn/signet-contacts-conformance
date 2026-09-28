@@ -17,6 +17,7 @@ can load them.
 | `vectors/cases/*.json` | Edge cases generated from the reference by `scripts/generate.mjs`. Each records an input and exactly what the TypeScript reference returns for it. |
 | `vectors/manifest.json` | The reference commit and version the files came from, the Node version that generated them, and a SHA-256 of every file. |
 | `docs/PORTING.md` | The places a port most often diverges without noticing, and how to get them right. |
+| `docs/NEXT-STEPS.md` | Current state, open decisions and findings in the reference. |
 
 ### Upstream vectors
 

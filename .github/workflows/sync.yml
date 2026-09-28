@@ -23,7 +23,11 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
+      # No stored credentials while npm runs the reference's install scripts;
+      # the token is handed over only in the push step below.
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           repository: forgesworn/signet-contacts
@@ -40,9 +44,12 @@ jobs:
         env:
           SIGNET_CONTACTS_DIR: .reference
         run: node scripts/generate.mjs
+      # Push and open the pull request with the fine-grained token rather than
+      # GITHUB_TOKEN: GitHub runs no workflows on a pull request that
+      # GITHUB_TOKEN opens or updates, so CI would never check the sync.
       - name: Open or refresh the sync pull request
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.PORTS_DISPATCH_TOKEN || github.token }}
         run: |
           if git diff --quiet -- vectors; then
             echo "Vectors already match signet-contacts main."
@@ -55,7 +62,7 @@ jobs:
           git checkout -B "$branch"
           git add vectors
           git commit -m "chore: sync vectors with signet-contacts $ref_sha"
-          git push --force origin "$branch"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$branch"
           if [ -z "$(gh pr list --head "$branch" --state open --json number --jq '.[].number')" ]; then
             gh pr create --head "$branch" --base main \
               --title "chore: sync vectors with signet-contacts" \

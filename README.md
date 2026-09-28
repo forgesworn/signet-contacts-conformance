@@ -95,8 +95,11 @@ signet-contacts (main)
 
 Cross-repository dispatch needs two secrets: `CONFORMANCE_DISPATCH_TOKEN` in
 `signet-contacts` and `PORTS_DISPATCH_TOKEN` here, each a fine-grained token
-allowed to send `repository_dispatch` to the target. Without them everything
-still converges on the nightly schedules.
+with Contents read and write on its target. `sync.yml` also pushes and opens
+its pull request with `PORTS_DISPATCH_TOKEN`, so that token needs Pull requests
+read and write on this repository too; a pull request opened with
+`GITHUB_TOKEN` would get no CI. Without the dispatch tokens everything still
+converges on the nightly schedules.
 
 ## Regenerating
 

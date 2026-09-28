@@ -566,11 +566,17 @@ const HEX = (c, n) => c.repeat(n);
   try { commit = execFileSync('git', ['-C', refDir, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(); } catch { /* not a checkout */ }
   const pkg = JSON.parse(readFileSync(join(refDir, 'package.json'), 'utf8'));
   if (!CHECK) {
+    const files = Object.fromEntries([...list('vectors'), ...list('vectors/cases')].map((p) => [p, sha(p)]));
+    // Provenance moves only when a vector does. Otherwise every commit to the
+    // reference would open a sync pull request and wake every port for nothing.
+    const manifestPath = join(root, 'vectors', 'manifest.json');
+    const old = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : null;
+    const unchanged = old && old.reference?.version === pkg.version && JSON.stringify(old.files) === JSON.stringify(files);
     emit('vectors/manifest.json', {
       description: 'Provenance for every vector file. vectors/*.json are copied verbatim from the reference; vectors/cases/*.json are generated from it by scripts/generate.mjs.',
-      reference: { package: pkg.name, version: pkg.version, commit },
-      generator: { node: process.version },
-      files: Object.fromEntries([...list('vectors'), ...list('vectors/cases')].map((p) => [p, sha(p)])),
+      reference: unchanged ? old.reference : { package: pkg.name, version: pkg.version, commit },
+      generator: unchanged ? old.generator : { node: process.version },
+      files,
     });
   }
 }

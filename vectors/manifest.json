@@ -2,14 +2,15 @@
   "description": "Provenance for every vector file. vectors/*.json are copied verbatim from the reference; vectors/cases/*.json are generated from it by scripts/generate.mjs.",
   "reference": {
     "package": "@forgesworn/signet-contacts",
-    "version": "0.1.0",
-    "commit": "fbb13cdeefb3e07421228ab3245b7e17e403ecab"
+    "version": "0.2.0",
+    "commit": "c97a8cf58b0f8410ee78d2ea770857a6e41824b9"
   },
   "generator": {
     "node": "v24.21.0"
   },
   "files": {
     "vectors/channel-check-v1.json": "1d315d6f8928c19a257ce8ed55755377dccaafd4b51a6a5d919b220fa31f838d",
+    "vectors/contact-card-v1.json": "572121b6ade758dd4f3a31cdc58f2d9f5fde20fad9f6cb4da3a43deb02011471",
     "vectors/contact-invite-v1.json": "d22e11ce850e5304764cac5183eea3a057f6bc9b4b1c0c1f3d8176f98c50c69d",
     "vectors/envelope.v2.json": "06bd0ceccabcc00e7e4f7e7e3aecfd8466bbd124667e4b1b72b333b4bcd91dc7",
     "vectors/pairing-code.json": "b9ae009f5a931f9d7b1ae1e34cc960c7700e2dc64cef05aa45d46eb779cd3be6",

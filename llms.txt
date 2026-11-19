@@ -1,0 +1,17 @@
+# Signet Contacts conformance
+
+> Language-neutral vectors for the Signet Contacts v2 wire format.
+
+## Documentation
+
+- [Conformance vectors](https://github.com/forgesworn/signet-contacts-conformance/blob/main/README.md): Shared fixtures and their coverage.
+- [Porting guide](https://github.com/forgesworn/signet-contacts-conformance/blob/main/docs/PORTING.md): Run the vectors against another implementation.
+
+## ForgeSworn ecosystem
+
+- [ForgeSworn library guide](https://forgesworn.dev/llms.txt): Find related libraries, tools and integration guides by task and runtime.
+- [ForgeSworn on GitHub](https://github.com/forgesworn): Browse the organisation’s public repositories.
+- [Project source](https://github.com/forgesworn/signet-contacts-conformance): Canonical source repository, documentation and release information.
+- [signet-contacts](https://github.com/forgesworn/signet-contacts): TypeScript reference for the v2 wire and API.
+- [signet-contacts-kotlin](https://github.com/forgesworn/signet-contacts-kotlin): Kotlin implementation of the same wire.
+- [signet-contacts-rs](https://github.com/forgesworn/signet-contacts-rs): Rust consumer implementation.
